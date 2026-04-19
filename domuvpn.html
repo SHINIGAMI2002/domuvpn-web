@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>domuVPN</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+Thai:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f5;
+  --bg2: #f4f0eb;
+  --surface: #ffffff;
+  --border: #e8e2d9;
+  --border2: #d4cdc2;
+  --ink: #1a1714;
+  --ink2: #6b6560;
+  --ink3: #a09890;
+  --sakura: #e8b4b8;
+  --sakura2: #f2d4d6;
+  --matcha: #7ea882;
+  --matcha2: #c8ddc9;
+  --gold: #c4a35a;
+  --gold2: #ede0c4;
+  --accent: #c9614a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Noto Sans Thai', 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* subtle texture */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c4a35a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+}
+
+/* ======= NAV ======= */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px;
+  height: 60px;
+  background: rgba(250,248,245,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex; align-items: baseline; gap: 6px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; color: var(--ink);
+  letter-spacing: -0.3px;
+}
+.logo-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px; font-weight: 300;
+  color: var(--ink3);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  align-self: center;
+  margin-left: 2px;
+}
+.logo-dot { color: var(--accent); }
+
+.nav-center {
+  display: flex; gap: 32px;
+}
+.nav-center a {
+  font-size: 13px; font-weight: 400;
+  color: var(--ink2); text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color .2s;
+  position: relative;
+}
+.nav-center a::after {
+  content: ''; position: absolute; bottom: -2px; left: 0;
+  width: 0; height: 1px; background: var(--ink);
+  transition: width .3s;
+}
+.nav-center a:hover { color: var(--ink); }
+.nav-center a:hover::after { width: 100%; }
+
+.nav-right { display: flex; gap: 10px; align-items: center; }
+
+.btn-text {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: var(--ink2);
+  font-family: inherit; padding: 6px 12px;
+  border-radius: 6px; transition: all .2s;
+}
+.btn-text:hover { color: var(--ink); background: var(--bg2); }
+
+.btn-pill {
+  background: var(--ink); color: var(--bg);
+  border: none; cursor: pointer;
+  font-size: 13px; font-family: inherit;
+  padding: 8px 20px; border-radius: 100px;
+  transition: all .2s; letter-spacing: 0.3px;
+}
+.btn-pill:hover { background: var(--accent); transform: translateY(-1px); }
+
+/* ======= PAGES ======= */
+.page { display: none; position: relative; z-index: 1; }
+.page.active { display: block; }
+
+/* ======= HERO ======= */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 60px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  align-items: center;
+  gap: 60px;
+}
+
+.hero-left { }
+
+.hero-kana {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 11px; font-weight: 300;
+  color: var(--ink3); letter-spacing: 6px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.hero-kana::before {
+  content: ''; display: block;
+  width: 24px; height: 1px; background: var(--ink3);
+}
+
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(42px, 5vw, 68px);
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+.hero h1 em {
+  font-style: italic; color: var(--accent);
+}
+
+.hero-sub-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px; font-weight: 300;
+  color: var(--ink3); letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.hero p {
+  font-size: 15px; line-height: 1.8;
+  color: var(--ink2); max-width: 380px;
+  margin-bottom: 36px;
+  font-weight: 300;
+}
+
+.hero-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+.btn-main {
+  background: var(--ink); color: var(--bg);
+  border: none; cursor: pointer;
+  font-size: 14px; font-family: inherit;
+  padding: 13px 28px; border-radius: 100px;
+  transition: all .25s; letter-spacing: 0.3px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-main:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,97,74,0.25); }
+
+.btn-outline {
+  background: transparent; color: var(--ink2);
+  border: 1px solid var(--border2); cursor: pointer;
+  font-size: 13px; font-family: inherit;
+  padding: 12px 24px; border-radius: 100px;
+  transition: all .25s;
+}
+.btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+/* Hero visual */
+.hero-right {
+  display: flex; justify-content: center; align-items: center;
+}
+
+.hero-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 32px;
+  width: 320px;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+  position: relative;
+}
+
+.hero-card-badge {
+  position: absolute; top: -12px; right: 24px;
+  background: var(--matcha); color: white;
+  font-size: 10px; font-weight: 700;
+  padding: 4px 12px; border-radius: 100px;
+  letter-spacing: 2px;
+}
+
+.hero-card-top {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.hc-avatar {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--sakura), var(--sakura2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.hc-name { font-size: 14px; font-weight: 500; }
+.hc-plan { font-size: 11px; color: var(--matcha); font-weight: 500; letter-spacing: 1px; }
+
+.hc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.hc-stat {
+  background: var(--bg);
+  border-radius: 12px; padding: 14px;
+}
+.hc-stat-label { font-size: 10px; color: var(--ink3); margin-bottom: 6px; letter-spacing: 1px; }
+.hc-stat-val { font-size: 18px; font-weight: 700; color: var(--ink); }
+.hc-stat-sub { font-size: 10px; color: var(--ink3); margin-top: 2px; }
+
+.hc-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink3); margin-bottom: 6px; }
+.hc-bar { height: 4px; background: var(--bg2); border-radius: 100px; overflow: hidden; }
+.hc-bar-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--matcha), var(--matcha2));
+  width: 35%; animation: grow .8s ease-out .3s both;
+}
+@keyframes grow { from { width: 0; } }
+
+.hc-status {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 16px;
+  background: var(--bg);
+  border-radius: 10px; padding: 10px 14px;
+}
+.hc-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--matcha);
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.hc-status-text { font-size: 11px; color: var(--matcha); font-weight: 600; letter-spacing: 1px; }
+.hc-status-right { font-size: 11px; color: var(--ink3); }
+
+/* floating elements */
+.float-tag {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 8px 14px;
+  font-size: 11px; color: var(--ink2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  display: flex; align-items: center; gap: 6px;
+  animation: floatUp 3s ease-in-out infinite alternate;
+}
+.float-tag:nth-child(2) { animation-delay: -1.5s; }
+@keyframes floatUp {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-6px); }
+}
+
+/* ======= STATS ======= */
+.stats-strip {
+  background: var(--ink);
+  padding: 20px 0;
+  position: relative; z-index: 1;
+  overflow: hidden;
+}
+.stats-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 32px; flex-wrap: wrap;
+}
+.stat-item { display: flex; align-items: center; gap: 16px; }
+.stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px; color: white; line-height: 1;
+}
+.stat-info { }
+.stat-label { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+.stat-jp { font-family: 'Noto Sans JP', sans-serif; font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.stat-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.1); }
+
+/* ======= PACKAGES ======= */
+.section {
+  max-width: 1200px; margin: 0 auto;
+  padding: 80px 40px;
+}
+
+.section-header {
+  margin-bottom: 48px;
+}
+.section-kana {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px; font-weight: 300;
+  color: var(--ink3); letter-spacing: 6px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-kana::before {
+  content: ''; display: block;
+  width: 20px; height: 1px; background: var(--ink3);
+}
+.section-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 36px; letter-spacing: -0.5px;
+}
+.section-header p { font-size: 14px; color: var(--ink2); margin-top: 8px; font-weight: 300; }
+
+/* plans */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.plan {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  transition: all .3s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.plan:hover {
+  border-color: var(--border2);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+}
+.plan.featured {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+
+.plan-season {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px; font-weight: 300;
+  letter-spacing: 4px; margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.plan-icon-wrap {
+  width: 48px; height: 48px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 20px;
+}
+.plan:not(.featured) .plan-icon-wrap { background: var(--bg); }
+.plan.featured .plan-icon-wrap { background: rgba(255,255,255,0.1); }
+
+.plan-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; margin-bottom: 4px;
+}
+.plan-name-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px; font-weight: 300;
+  letter-spacing: 3px; margin-bottom: 20px;
+}
+.plan:not(.featured) .plan-name-jp { color: var(--ink3); }
+.plan.featured .plan-name-jp { color: rgba(255,255,255,0.4); }
+
+.plan-price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 24px; }
+.plan-price {
+  font-family: 'DM Serif Display', serif;
+  font-size: 40px; line-height: 1;
+}
+.plan-currency { font-size: 16px; }
+.plan-period { font-size: 12px; font-weight: 300; }
+.plan:not(.featured) .plan-period { color: var(--ink3); }
+.plan.featured .plan-period { color: rgba(255,255,255,0.5); }
+
+.plan-divider {
+  height: 1px;
+  margin-bottom: 20px;
+}
+.plan:not(.featured) .plan-divider { background: var(--border); }
+.plan.featured .plan-divider { background: rgba(255,255,255,0.1); }
+
+.plan-features { list-style: none; margin-bottom: 28px; }
+.plan-features li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 300;
+  padding: 7px 0;
+}
+.plan:not(.featured) .plan-features li { color: var(--ink2); }
+.plan.featured .plan-features li { color: rgba(255,255,255,0.8); }
+.feat-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.plan:not(.featured) .feat-dot { background: var(--matcha); }
+.plan.featured .feat-dot { background: var(--sakura); }
+
+.plan-btn {
+  width: 100%; padding: 12px;
+  border-radius: 100px; cursor: pointer;
+  font-size: 13px; font-family: inherit;
+  font-weight: 500; letter-spacing: 0.3px;
+  transition: all .2s;
+}
+.plan:not(.featured) .plan-btn {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  color: var(--ink);
+}
+.plan:not(.featured) .plan-btn:hover {
+  background: var(--ink); color: white; border-color: var(--ink);
+}
+.plan.featured .plan-btn {
+  background: white; color: var(--ink); border: none;
+}
+.plan.featured .plan-btn:hover {
+  background: var(--sakura); transform: scale(1.01);
+}
+
+/* ======= FEATURES ======= */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+}
+.feat-card-icon {
+  font-size: 28px; margin-bottom: 16px;
+}
+.feat-card h3 {
+  font-size: 16px; font-weight: 600; margin-bottom: 4px;
+}
+.feat-card-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px; color: var(--ink3); letter-spacing: 2px; margin-bottom: 12px;
+}
+.feat-card p { font-size: 13px; color: var(--ink2); line-height: 1.7; font-weight: 300; }
+
+/* ======= MODAL ======= */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(26,23,20,0.5);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%; max-width: 380px;
+  margin: 16px;
+  transform: translateY(16px) scale(0.98);
+  transition: transform .3s;
+  position: relative;
+}
+.overlay.open .modal { transform: translateY(0) scale(1); }
+
+.modal-close {
+  position: absolute; top: 20px; right: 20px;
+  background: var(--bg2); border: none; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 14px; color: var(--ink2);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.modal-close:hover { background: var(--border2); }
+
+.modal-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; margin-bottom: 4px;
+}
+.modal-logo span { color: var(--accent); }
+.modal-sub {
+  font-size: 12px; color: var(--ink3);
+  letter-spacing: 2px;
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 300;
+  margin-bottom: 28px;
+}
+
+.tab-row {
+  display: flex;
+  background: var(--bg);
+  border-radius: 12px; padding: 4px;
+  margin-bottom: 24px; gap: 4px;
+}
+.tab-btn {
+  flex: 1; padding: 8px; border-radius: 8px;
+  font-size: 13px; font-family: inherit;
+  border: none; background: transparent;
+  color: var(--ink2); cursor: pointer;
+  transition: all .2s; font-weight: 500;
+}
+.tab-btn.on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.field { margin-bottom: 14px; }
+.field label {
+  display: block; font-size: 11px;
+  color: var(--ink3); margin-bottom: 6px;
+  letter-spacing: 1px; font-weight: 400;
+}
+.field input {
+  width: 100%; padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--ink); font-size: 14px;
+  font-family: inherit; outline: none;
+  transition: border-color .2s;
+}
+.field input:focus { border-color: var(--border2); background: white; }
+
+.btn-enter {
+  width: 100%; padding: 13px;
+  border-radius: 100px;
+  background: var(--ink); color: white;
+  border: none; cursor: pointer;
+  font-size: 14px; font-family: inherit;
+  font-weight: 500; margin-top: 8px;
+  transition: all .2s;
+}
+.btn-enter:hover { background: var(--accent); transform: translateY(-1px); }
+
+/* ======= DASHBOARD ======= */
+.dash-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 60px);
+}
+
+.dash-sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 32px 20px;
+  position: sticky; top: 60px;
+  height: calc(100vh - 60px);
+}
+
+.dash-user {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.d-avatar {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--sakura2), var(--sakura));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  position: relative; cursor: pointer; overflow: hidden;
+}
+.d-avatar img {
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: 12px;
+}
+.d-avatar-overlay {
+  position: absolute; inset: 0;
+  background: rgba(26,23,20,0.55);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .2s;
+  font-size: 14px;
+}
+.d-avatar:hover .d-avatar-overlay { opacity: 1; }
+.d-avatar-input { display: none; }
+.d-name { font-size: 14px; font-weight: 600; }
+.d-plan {
+  font-size: 10px; color: var(--matcha);
+  font-family: 'Noto Sans JP', sans-serif;
+  letter-spacing: 1px;
+}
+
+.dash-nav { }
+.dash-nav-group-label {
+  font-size: 9px; color: var(--ink3);
+  letter-spacing: 3px; margin: 20px 0 8px 10px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.dash-nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 10px;
+  font-size: 13px; color: var(--ink2);
+  text-decoration: none; transition: all .2s;
+  margin-bottom: 2px;
+}
+.dash-nav a:hover { background: var(--bg); color: var(--ink); }
+.dash-nav a.on { background: var(--bg2); color: var(--ink); font-weight: 500; }
+.dash-nav a .nav-icon { font-size: 16px; opacity: 0.7; }
+
+.dash-main { padding: 32px 36px; background: var(--bg); }
+
+.dash-greeting {
+  margin-bottom: 28px;
+}
+.dash-greeting h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px; margin-bottom: 2px;
+}
+.dash-greeting p { font-size: 13px; color: var(--ink2); font-weight: 300; }
+
+/* metric cards */
+.metric-row {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 14px; margin-bottom: 20px;
+}
+.metric {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+}
+.metric-label {
+  font-size: 10px; color: var(--ink3);
+  letter-spacing: 2px; margin-bottom: 10px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.metric-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px; color: var(--ink);
+  line-height: 1; margin-bottom: 4px;
+}
+.metric-sub { font-size: 11px; color: var(--ink3); }
+.metric.green .metric-val { color: var(--matcha); }
+.metric.red .metric-val { color: var(--accent); }
+
+/* config box */
+.config-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.config-box-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+.config-box-header h3 {
+  font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px;
+}
+.config-box-header-jp {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 10px; color: var(--ink3); letter-spacing: 2px;
+}
+
+.config-item {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 12px; margin-bottom: 8px;
+}
+.config-item:last-child { margin-bottom: 0; }
+.ci-label { font-size: 10px; color: var(--ink3); letter-spacing: 1px; margin-bottom: 3px; }
+.ci-val { font-size: 13px; font-weight: 500; color: var(--ink); font-family: 'Noto Sans JP', sans-serif; }
+.ci-copy {
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  font-size: 11px; color: var(--ink2);
+  cursor: pointer; font-family: inherit;
+  transition: all .2s; flex-shrink: 0;
+}
+.ci-copy:hover { background: var(--ink); color: white; border-color: var(--ink); }
+
+/* qr section */
+.qr-section {
+  display: flex; gap: 20px; align-items: flex-start;
+  margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.qr-img {
+  width: 88px; height: 88px;
+  border-radius: 12px; border: 1px solid var(--border);
+  overflow: hidden; flex-shrink: 0; background: white;
+  display: flex; align-items: center; justify-content: center; padding: 6px;
+}
+.qr-img img { width: 100%; }
+.qr-desc p { font-size: 12px; color: var(--ink2); line-height: 1.8; margin-bottom: 10px; font-weight: 300; }
+.btn-sm {
+  padding: 7px 16px; border-radius: 100px;
+  border: 1px solid var(--border2);
+  background: transparent; font-size: 12px;
+  color: var(--ink2); cursor: pointer; font-family: inherit;
+  transition: all .2s;
+}
+.btn-sm:hover { background: var(--ink); color: white; border-color: var(--ink); }
+
+/* progress */
+.prog-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink3); margin-bottom: 8px; }
+.prog-track { height: 4px; background: var(--bg2); border-radius: 100px; overflow: hidden; }
+.prog-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--matcha), var(--matcha2));
+  animation: fillAnim 1s ease-out .2s both;
+}
+@keyframes fillAnim { from {width:0} }
+
+/* ======= ADMIN ======= */
+.admin-main { padding: 32px 36px; background: var(--bg); }
+
+.admin-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 28px;
+}
+.admin-header h2 {
+  font-family: 'DM Serif Display', serif; font-size: 26px;
+}
+.admin-header p { font-size: 13px; color: var(--ink2); margin-top: 2px; font-weight: 300; }
+
+.admin-metrics {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 14px; margin-bottom: 24px;
+}
+.admin-metric {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+}
+.am-label { font-size: 10px; color: var(--ink3); letter-spacing: 2px; margin-bottom: 10px; font-family: 'Noto Sans JP', sans-serif; }
+.am-val { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); }
+
+.table-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+}
+.table-card-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.table-card-header h3 { font-size: 15px; font-weight: 600; }
+
+table { width: 100%; border-collapse: collapse; }
+th {
+  padding: 12px 20px; text-align: left;
+  font-size: 10px; color: var(--ink3); font-weight: 500;
+  letter-spacing: 2px; border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 14px 20px; font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+
+.chip {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 100px; font-size: 10px;
+  font-weight: 600; letter-spacing: 1px;
+}
+.chip-green { background: var(--matcha2); color: #2d6b31; }
+.chip-red { background: #fde8e4; color: var(--accent); }
+.chip-yellow { background: #fef3d0; color: #9a6f1a; }
+
+.act-btn {
+  padding: 4px 12px; border-radius: 100px;
+  border: 1px solid var(--border2); background: transparent;
+  font-size: 11px; color: var(--ink2); cursor: pointer;
+  font-family: inherit; transition: all .2s; margin-right: 4px;
+}
+.act-btn:hover { background: var(--ink); color: white; border-color: var(--ink); }
+.act-btn.warn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* ======= FOOTER ======= */
+footer {
+  background: var(--ink); color: rgba(255,255,255,0.5);
+  padding: 32px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; position: relative; z-index: 1;
+}
+footer .f-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px; color: white;
+}
+.f-logo span { color: var(--sakura); }
+
+/* ======= RESPONSIVE ======= */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding: 48px 24px; min-height: auto; gap: 40px; }
+  .hero-right { justify-content: flex-start; }
+  .plans { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .dash-layout { grid-template-columns: 1fr; }
+  .dash-sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .metric-row { grid-template-columns: 1fr 1fr; }
+  .admin-metrics { grid-template-columns: 1fr 1fr; }
+  nav { padding: 0 20px; }
+  .nav-center { display: none; }
+  .section { padding: 48px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">domu<span>VPN</span></div>
+    <div class="modal-sub">ドムVPN · ยินดีต้อนรับ</div>
+    <div class="tab-row">
+      <button class="tab-btn on" onclick="switchTab(this,'login')">เข้าสู่ระบบ</button>
+      <button class="tab-btn" onclick="switchTab(this,'reg')">สมัครสมาชิก</button>
+    </div>
+    <div id="form-login">
+      <div class="field"><label>ชื่อผู้ใช้ / อีเมล</label><input type="text" placeholder="username หรือ email"></div>
+      <div class="field"><label>รหัสผ่าน</label><input type="password" placeholder="••••••••"></div>
+      <button class="btn-enter" onclick="toDash()">เข้าสู่ระบบ →</button>
+    </div>
+    <div id="form-reg" style="display:none">
+      <div class="field"><label>ชื่อผู้ใช้</label><input type="text" placeholder="username"></div>
+      <div class="field"><label>อีเมล</label><input type="email" placeholder="email@example.com"></div>
+      <div class="field"><label>รหัสผ่าน</label><input type="password" placeholder="••••••••"></div>
+      <button class="btn-enter" onclick="toDash()">สมัครสมาชิก →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">domu<span class="logo-dot">VPN</span> <span class="logo-jp">ドムVPN</span></div>
+  <div class="nav-center">
+    <a href="#" onclick="showPage('home');return false">หน้าหลัก</a>
+    <a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('pkg').scrollIntoView({behavior:'smooth'}),100);return false">แพ็กเกจ</a>
+    <a href="#" onclick="showPage('dash');return false">Dashboard</a>
+    <a href="#" onclick="showPage('admin');return false">Admin</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-text" onclick="openModal()">เข้าสู่ระบบ</button>
+    <button class="btn-pill" onclick="openModal()">สมัครฟรี</button>
+  </div>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="page-home">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-kana">ドムVPN · SECURE NETWORK</div>
+      <h1>เชื่อมต่อ<br><em>ไร้ขีดจำกัด</em></h1>
+      <div class="hero-sub-jp">自由に · 安全に · 高速に</div>
+      <p>VPN คุณภาพสูง ด้วย VLESS + Reality Protocol ปลอดภัย เสถียร รวดเร็ว รองรับทุกอุปกรณ์</p>
+      <div class="hero-actions">
+        <button class="btn-main" onclick="document.getElementById('pkg').scrollIntoView({behavior:'smooth'})">ดูแพ็กเกจ →</button>
+        <button class="btn-outline" onclick="showPage('dash')">ดู Dashboard</button>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div style="position:relative">
+        <div class="hero-card">
+          <div class="hero-card-badge">ACTIVE</div>
+          <div class="hero-card-top">
+            <div class="hc-avatar">🌸</div>
+            <div>
+              <div class="hc-name">สมชาย ใจดี</div>
+              <div class="hc-plan">PRO PLAN · アクティブ</div>
+            </div>
+          </div>
+          <div class="hc-stats">
+            <div class="hc-stat">
+              <div class="hc-stat-label">วันหมดอายุ</div>
+              <div class="hc-stat-val">18</div>
+              <div class="hc-stat-sub">วันที่เหลือ</div>
+            </div>
+            <div class="hc-stat">
+              <div class="hc-stat-label">ความเร็ว</div>
+              <div class="hc-stat-val">500</div>
+              <div class="hc-stat-sub">Mbps</div>
+            </div>
+          </div>
+          <div class="hc-bar-label"><span>Data ใช้ไป</span><span>47 GB / ∞</span></div>
+          <div class="hc-bar"><div class="hc-bar-fill"></div></div>
+          <div class="hc-status">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="hc-status-dot"></div>
+              <div class="hc-status-text">CONNECTED</div>
+            </div>
+            <div class="hc-status-right">shinigami89.duckdns.org</div>
+          </div>
+        </div>
+        <!-- floating tags -->
+        <div class="float-tag" style="position:absolute;top:-16px;right:-20px">🔒 VLESS + Reality</div>
+        <div class="float-tag" style="position:absolute;bottom:-16px;left:-20px">⚡ 1 Gbps Port</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-num">99.9%</div>
+        <div class="stat-info">
+          <div class="stat-label">UPTIME</div>
+          <div class="stat-jp">稼働率</div>
+        </div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">1Gbps</div>
+        <div class="stat-info">
+          <div class="stat-label">PORT SPEED</div>
+          <div class="stat-jp">通信速度</div>
+        </div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">500+</div>
+        <div class="stat-info">
+          <div class="stat-label">USERS</div>
+          <div class="stat-jp">ユーザー数</div>
+        </div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-info">
+          <div class="stat-label">PROTOCOLS</div>
+          <div class="stat-jp">プロトコル</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Packages -->
+  <div class="section" id="pkg">
+    <div class="section-header">
+      <div class="section-kana">プラン · PACKAGES</div>
+      <h2>เลือกแพ็กเกจ<br>ที่เหมาะกับคุณ</h2>
+      <p>ราคาสบายกระเป๋า คุณภาพระดับพรีเมียม ไม่มีสัญญาผูกมัด</p>
+    </div>
+    <div class="plans">
+
+      <div class="plan" onclick="openModal()">
+        <div class="plan-season">はる · SPRING</div>
+        <div class="plan-icon-wrap">🌸</div>
+        <div class="plan-name">Basic</div>
+        <div class="plan-name-jp">ベーシック</div>
+        <div class="plan-price-row">
+          <div class="plan-currency">฿</div>
+          <div class="plan-price">69</div>
+          <div class="plan-period">/ เดือน</div>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><div class="feat-dot"></div>30 GB ต่อเดือน</li>
+          <li><div class="feat-dot"></div>ความเร็วสูงสุด 100 Mbps</li>
+          <li><div class="feat-dot"></div>1 อุปกรณ์</li>
+          <li><div class="feat-dot"></div>VLESS + TLS</li>
+        </ul>
+        <button class="plan-btn">เลือกแพ็กเกจนี้</button>
+      </div>
+
+      <div class="plan featured" onclick="openModal()">
+        <div class="plan-season">なつ · SUMMER</div>
+        <div class="plan-icon-wrap">⛩️</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-name-jp">プロ · แนะนำ</div>
+        <div class="plan-price-row">
+          <div class="plan-currency">฿</div>
+          <div class="plan-price">129</div>
+          <div class="plan-period">/ เดือน</div>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><div class="feat-dot"></div>Unlimited Data</li>
+          <li><div class="feat-dot"></div>ความเร็วสูงสุด 500 Mbps</li>
+          <li><div class="feat-dot"></div>2 อุปกรณ์</li>
+          <li><div class="feat-dot"></div>VLESS + Reality</li>
+          <li><div class="feat-dot"></div>Anti-detection</li>
+        </ul>
+        <button class="plan-btn">เลือกแพ็กเกจนี้</button>
+      </div>
+
+      <div class="plan" onclick="openModal()">
+        <div class="plan-season">あき · AUTUMN</div>
+        <div class="plan-icon-wrap">🍁</div>
+        <div class="plan-name">Ultra</div>
+        <div class="plan-name-jp">ウルトラ</div>
+        <div class="plan-price-row">
+          <div class="plan-currency">฿</div>
+          <div class="plan-price">199</div>
+          <div class="plan-period">/ เดือน</div>
+        </div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><div class="feat-dot"></div>Unlimited Data</li>
+          <li><div class="feat-dot"></div>Full Speed 1 Gbps</li>
+          <li><div class="feat-dot"></div>5 อุปกรณ์</li>
+          <li><div class="feat-dot"></div>VLESS + Reality + WS</li>
+          <li><div class="feat-dot"></div>Anti-detection</li>
+          <li><div class="feat-dot"></div>Priority support</li>
+        </ul>
+        <button class="plan-btn">เลือกแพ็กเกจนี้</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section" style="padding-top:0">
+    <div class="section-header">
+      <div class="section-kana">とくちょう · FEATURES</div>
+      <h2>ทำไมต้อง<br>domuVPN?</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-card-icon">🔒</div>
+        <h3>ปลอดภัยสูงสุด</h3>
+        <div class="feat-card-jp">セキュリティ</div>
+        <p>VLESS + Reality Protocol ทันสมัยที่สุด ตรวจจับไม่ได้ ข้อมูลเข้ารหัสทั้งหมด</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-icon">⚡</div>
+        <h3>เร็วและเสถียร</h3>
+        <div class="feat-card-jp">高速・安定</div>
+        <p>Port 1 Gbps เน็ตไม่สะดุด ดู YouTube 4K สตรีมเกมออนไลน์ได้สบาย</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-icon">🌸</div>
+        <h3>ใช้ง่าย</h3>
+        <div class="feat-card-jp">使いやすい</div>
+        <p>สแกน QR เชื่อมต่อทันที รองรับ v2rayNG, Hiddify, Streisand ทุกแพลตฟอร์ม</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-icon">🎌</div>
+        <h3>ซัพพอร์ตไทย</h3>
+        <div class="feat-card-jp">サポート</div>
+        <p>ทีมงานดูแลตลอด 24 ชั่วโมง ติดต่อผ่าน Line ได้เลย ไม่มีภาษาอังกฤษ</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-icon">💳</div>
+        <h3>ชำระง่าย</h3>
+        <div class="feat-card-jp">お支払い</div>
+        <p>โอนผ่าน PromptPay แค่ส่ง slip ให้ Admin ยืนยัน เปิดใช้งานภายใน 5 นาที</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-card-icon">📱</div>
+        <h3>ทุกอุปกรณ์</h3>
+        <div class="feat-card-jp">マルチデバイス</div>
+        <p>Android, iOS, Windows, macOS, Linux รองรับหมด ใช้พร้อมกันได้ตามแพ็กเกจ</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="f-logo">domu<span>VPN</span> <span style="font-family:'Noto Sans JP';font-size:12px;color:rgba(255,255,255,0.3);font-weight:300;letter-spacing:2px">ドムVPN</span></div>
+    <div>© 2025 domuVPN · Line: @domuvpn</div>
+  </footer>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="page" id="page-dash">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-user">
+        <div class="d-avatar" onclick="document.getElementById('avatarInput').click()" title="เปลี่ยนรูปโปรไฟล์">
+          <img id="dashAvatarImg" src="" alt="" style="display:none">
+          <span id="dashAvatarEmoji">🌸</span>
+          <div class="d-avatar-overlay">📷</div>
+          <input class="d-avatar-input" type="file" id="avatarInput" accept="image/*" onchange="changeAvatar(this)">
+        </div>
+        <div>
+          <div class="d-name">สมชาย ใจดี</div>
+          <div class="d-plan">PRO · プロ</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:3px;cursor:pointer" onclick="document.getElementById('avatarInput').click()">เปลี่ยนรูป ✎</div>
+        </div>
+      </div>
+      <div class="dash-nav">
+        <div class="dash-nav-group-label">メイン</div>
+        <a href="#" class="on" onclick="return false"><span class="nav-icon">📊</span> ภาพรวม</a>
+        <a href="#" onclick="return false"><span class="nav-icon">📦</span> แพ็กเกจของฉัน</a>
+        <a href="#" onclick="return false"><span class="nav-icon">🔑</span> Config & QR</a>
+        <div class="dash-nav-group-label">アカウント</div>
+        <a href="#" onclick="return false"><span class="nav-icon">💳</span> ชำระเงิน</a>
+        <a href="#" onclick="return false"><span class="nav-icon">📜</span> ประวัติ</a>
+        <div class="dash-nav-group-label" style="margin-top:auto"></div>
+        <a href="#" onclick="showPage('home');return false" style="margin-top:20px"><span class="nav-icon">←</span> กลับหน้าหลัก</a>
+      </div>
+    </div>
+
+    <div class="dash-main">
+      <div class="dash-greeting">
+        <h2>สวัสดีครับ สมชาย 🌸</h2>
+        <p>こんにちは · วันนี้การเชื่อมต่อของคุณปกติดี</p>
+      </div>
+
+      <div class="metric-row">
+        <div class="metric green">
+          <div class="metric-label">สถานะ · ステータス</div>
+          <div class="metric-val">ACTIVE</div>
+          <div class="metric-sub">Pro Plan · เปิดใช้งาน</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">วันหมดอายุ · 有効期限</div>
+          <div class="metric-val">18 วัน</div>
+          <div class="metric-sub">หมด 7 ก.พ. 2568</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">ความเร็ว · 速度</div>
+          <div class="metric-val">500 Mbps</div>
+          <div class="metric-sub">Port 1 Gbps</div>
+        </div>
+      </div>
+
+      <div class="config-box">
+        <div class="config-box-header">
+          <div>
+            <h3>🔑 Config & QR Code</h3>
+            <div class="config-box-header-jp">接続情報 · ข้อมูลการเชื่อมต่อ</div>
+          </div>
+        </div>
+
+        <div class="config-item">
+          <div><div class="ci-label">ADDRESS</div><div class="ci-val">shinigami89.duckdns.org</div></div>
+          <button class="ci-copy" onclick="copied(this,'shinigami89.duckdns.org')">copy</button>
+        </div>
+        <div class="config-item">
+          <div><div class="ci-label">PORT</div><div class="ci-val">2545</div></div>
+          <button class="ci-copy" onclick="copied(this,'2545')">copy</button>
+        </div>
+        <div class="config-item">
+          <div><div class="ci-label">UUID</div><div class="ci-val">a1b2c3d4-xxxx-xxxx-xxxx-xxxxxxxx</div></div>
+          <button class="ci-copy" onclick="copied(this,'uuid')">copy</button>
+        </div>
+        <div class="config-item">
+          <div><div class="ci-label">VLESS LINK</div><div class="ci-val" style="font-size:11px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">vless://a1b2c3d4@shinigami89.duckdns.org:2545?...</div></div>
+          <button class="ci-copy" onclick="copied(this,'vless://...')">copy</button>
+        </div>
+
+        <div class="qr-section">
+          <div class="qr-img">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?data=vless://example&size=88x88&bgcolor=ffffff&color=1a1714" alt="QR">
+          </div>
+          <div class="qr-desc">
+            <p>สแกน QR Code ด้วย <strong>v2rayNG</strong>, <strong>Hiddify</strong> หรือ <strong>Streisand</strong><br>เพื่อเชื่อมต่ออัตโนมัติ ไม่ต้องตั้งค่าเอง</p>
+            <button class="btn-sm">⬇ บันทึก QR</button>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+          <div class="prog-row"><span>Data ใช้ไปเดือนนี้</span><span>47.3 GB / ∞</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:28%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN ===== -->
+<div class="page" id="page-admin">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-user">
+        <div class="d-avatar">⚙️</div>
+        <div>
+          <div class="d-name">Admin</div>
+          <div class="d-plan">ADMINISTRATOR · 管理者</div>
+        </div>
+      </div>
+      <div class="dash-nav">
+        <div class="dash-nav-group-label">管理</div>
+        <a href="#" class="on" onclick="return false"><span class="nav-icon">👥</span> จัดการ User</a>
+        <a href="#" onclick="return false"><span class="nav-icon">📋</span> คำสั่งซื้อ</a>
+        <a href="#" onclick="return false"><span class="nav-icon">🧾</span> ยืนยัน Slip</a>
+        <a href="#" onclick="return false"><span class="nav-icon">📊</span> รายได้</a>
+        <a href="#" onclick="showPage('home');return false" style="margin-top:20px"><span class="nav-icon">←</span> กลับหน้าหลัก</a>
+      </div>
+    </div>
+
+    <div class="admin-main">
+      <div class="admin-header">
+        <div>
+          <h2>Admin Panel</h2>
+          <p>管理パネル · จัดการระบบทั้งหมด</p>
+        </div>
+        <button class="btn-pill" style="font-size:13px">+ เพิ่ม User</button>
+      </div>
+
+      <div class="admin-metrics">
+        <div class="admin-metric">
+          <div class="am-label">USER ทั้งหมด</div>
+          <div class="am-val">248</div>
+        </div>
+        <div class="admin-metric">
+          <div class="am-label">ACTIVE วันนี้</div>
+          <div class="am-val" style="color:var(--matcha)">182</div>
+        </div>
+        <div class="admin-metric">
+          <div class="am-label">รอยืนยัน SLIP</div>
+          <div class="am-val" style="color:#c4a35a">5</div>
+        </div>
+        <div class="admin-metric">
+          <div class="am-label">รายได้เดือนนี้</div>
+          <div class="am-val" style="color:var(--accent)">฿24,850</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-card-header">
+          <h3>👥 ผู้ใช้งานทั้งหมด</h3>
+          <button class="btn-sm">Export</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>USERNAME</th>
+              <th>แพ็กเกจ</th>
+              <th>หมดอายุ</th>
+              <th>DATA</th>
+              <th>สถานะ</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:500">somchai_vip</td>
+              <td>Pro</td>
+              <td>7 ก.พ. 68</td>
+              <td>47.3 GB</td>
+              <td><span class="chip chip-green">ACTIVE</span></td>
+              <td>
+                <button class="act-btn">แก้ไข</button>
+                <button class="act-btn warn">ลบ</button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">narak_user</td>
+              <td>Ultra</td>
+              <td>15 ก.พ. 68</td>
+              <td>203 GB</td>
+              <td><span class="chip chip-green">ACTIVE</span></td>
+              <td>
+                <button class="act-btn">แก้ไข</button>
+                <button class="act-btn warn">ลบ</button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">new_buyer_01</td>
+              <td>Basic</td>
+              <td>—</td>
+              <td>—</td>
+              <td><span class="chip chip-yellow">PENDING</span></td>
+              <td>
+                <button class="act-btn" style="border-color:var(--matcha);color:var(--matcha)">✓ ยืนยัน Slip</button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:500">old_user_99</td>
+              <td>Basic</td>
+              <td>1 ม.ค. 68</td>
+              <td>28 GB</td>
+              <td><span class="chip chip-red">EXPIRED</span></td>
+              <td>
+                <button class="act-btn">ต่ออายุ</button>
+                <button class="act-btn warn">ลบ</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function changeAvatar(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('dashAvatarImg');
+      const emoji = document.getElementById('dashAvatarEmoji');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      emoji.style.display = 'none';
+      // also update hero card avatar if visible
+      const hcAvatar = document.querySelector('.hc-avatar');
+      if (hcAvatar) {
+        hcAvatar.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
+  function openModal() { document.getElementById('overlay').classList.add('open'); }
+  function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+  document.getElementById('overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+  function switchTab(el, id) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+    el.classList.add('on');
+    document.getElementById('form-login').style.display = id==='login' ? '' : 'none';
+    document.getElementById('form-reg').style.display   = id==='reg'   ? '' : 'none';
+  }
+
+  function toDash() { closeModal(); showPage('dash'); }
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-'+name).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function copied(btn, text) {
+    navigator.clipboard.writeText(text).catch(()=>{});
+    const o = btn.textContent;
+    btn.textContent = '✓ copied';
+    btn.style.background = 'var(--matcha)';
+    btn.style.color = 'white';
+    btn.style.borderColor = 'var(--matcha)';
+    setTimeout(() => {
+      btn.textContent = o;
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1500);
+  }
+</script>
+</body>
+</html>
