@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>domuVPN</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+Thai:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f5;--bg2:#f4f0eb;--surface:#ffffff;--border:#e8e2d9;--border2:#d4cdc2;--ink:#1a1714;--ink2:#6b6560;--ink3:#a09890;--sakura:#e8b4b8;--sakura2:#f2d4d6;--matcha:#7ea882;--matcha2:#c8ddc9;--accent:#c9614a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Noto Sans Thai','Noto Sans JP',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23c4a35a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(250,248,245,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:baseline;gap:6px;font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink)}
+.logo-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:300;color:var(--ink3);letter-spacing:3px;align-self:center;margin-left:2px}
+.logo-dot{color:var(--accent)}
+.nav-right{display:flex;gap:10px;align-items:center}
+.btn-text{background:none;border:none;cursor:pointer;font-size:13px;color:var(--ink2);font-family:inherit;padding:6px 12px;border-radius:6px;transition:all .2s}
+.btn-text:hover{color:var(--ink);background:var(--bg2)}
+.btn-pill{background:var(--ink);color:var(--bg);border:none;cursor:pointer;font-size:13px;font-family:inherit;padding:8px 20px;border-radius:100px;transition:all .2s}
+.btn-pill:hover{background:var(--accent);transform:translateY(-1px)}
+.page{display:none;position:relative;z-index:1}
+.page.active{display:block}
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 60px);max-width:1100px;margin:0 auto;padding:0 32px;align-items:center;gap:60px}
+.hero-kana{font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:6px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.hero-kana::before{content:'';display:block;width:24px;height:1px;background:var(--ink3)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(40px,5vw,64px);line-height:1.1;letter-spacing:-1px;margin-bottom:8px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-sub-jp{font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:300;color:var(--ink3);letter-spacing:2px;margin-bottom:24px}
+.hero p{font-size:15px;line-height:1.8;color:var(--ink2);max-width:380px;margin-bottom:36px;font-weight:300}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-main{background:var(--ink);color:var(--bg);border:none;cursor:pointer;font-size:14px;font-family:inherit;padding:13px 28px;border-radius:100px;transition:all .25s}
+.btn-main:hover{background:var(--accent);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--ink2);border:1px solid var(--border2);cursor:pointer;font-size:13px;font-family:inherit;padding:12px 24px;border-radius:100px;transition:all .25s}
+.btn-outline:hover{border-color:var(--ink);color:var(--ink)}
+.hero-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px;width:300px;box-shadow:0 4px 40px rgba(0,0,0,0.06)}
+.hc-top{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.hc-dot{width:6px;height:6px;border-radius:50%;background:var(--matcha);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hc-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.hc-stat{background:var(--bg);border-radius:12px;padding:14px}
+.hc-stat-label{font-size:10px;color:var(--ink3);margin-bottom:4px;letter-spacing:1px}
+.hc-stat-val{font-size:20px;font-weight:700}
+.hc-stat-sub{font-size:10px;color:var(--ink3)}
+.hc-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:6px}
+.hc-bar{height:4px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.hc-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--matcha),var(--matcha2));width:30%}
+.stats-strip{background:var(--ink);padding:20px 0;position:relative;z-index:1}
+.stats-inner{max-width:1100px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.stat-item{display:flex;align-items:center;gap:14px}
+.stat-num{font-family:'DM Serif Display',serif;font-size:28px;color:white}
+.stat-label{font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:1px}
+.stat-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:rgba(255,255,255,0.3)}
+.stat-divider{width:1px;height:32px;background:rgba(255,255,255,0.1)}
+.section{max-width:1100px;margin:0 auto;padding:72px 32px}
+.section-kana{font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:300;color:var(--ink3);letter-spacing:6px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.section-kana::before{content:'';display:block;width:20px;height:1px;background:var(--ink3)}
+.section h2{font-family:'DM Serif Display',serif;font-size:34px;letter-spacing:-0.5px;margin-bottom:8px}
+.section>p{font-size:14px;color:var(--ink2);margin-bottom:40px;font-weight:300}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.plan{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;transition:all .3s;cursor:pointer}
+.plan:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.08)}
+.plan.featured{background:var(--ink);color:white}
+.plan-season{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:4px;margin-bottom:20px;opacity:.5}
+.plan-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:20px}
+.plan:not(.featured) .plan-icon{background:var(--bg)}
+.plan.featured .plan-icon{background:rgba(255,255,255,.1)}
+.plan-name{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:4px}
+.plan-name-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;margin-bottom:20px;opacity:.5}
+.plan-price-row{display:flex;align-items:baseline;gap:4px;margin-bottom:24px}
+.plan-price{font-family:'DM Serif Display',serif;font-size:40px;line-height:1}
+.plan-period{font-size:12px;font-weight:300;opacity:.6}
+.plan-div{height:1px;margin-bottom:20px}
+.plan:not(.featured) .plan-div{background:var(--border)}
+.plan.featured .plan-div{background:rgba(255,255,255,.1)}
+.plan-features{list-style:none;margin-bottom:28px}
+.plan-features li{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:300;padding:7px 0;opacity:.8}
+.feat-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.plan:not(.featured) .feat-dot{background:var(--matcha)}
+.plan.featured .feat-dot{background:var(--sakura)}
+.plan-btn{width:100%;padding:12px;border-radius:100px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;transition:all .2s}
+.plan:not(.featured) .plan-btn{background:var(--bg);border:1px solid var(--border2);color:var(--ink)}
+.plan:not(.featured) .plan-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.plan.featured .plan-btn{background:white;color:var(--ink);border:none}
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(26,23,20,.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:360px;margin:16px;transform:translateY(16px) scale(.98);transition:transform .3s;position:relative}
+.overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--bg2);border:none;cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center}
+.modal-logo{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:4px}
+.modal-logo span{color:var(--accent)}
+.modal-sub{font-size:12px;color:var(--ink3);letter-spacing:2px;font-family:'Noto Sans JP',sans-serif;font-weight:300;margin-bottom:24px}
+.tab-row{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:20px;gap:4px}
+.tab-btn{flex:1;padding:8px;border-radius:8px;font-size:13px;font-family:inherit;border:none;background:transparent;color:var(--ink2);cursor:pointer;transition:all .2s;font-weight:500}
+.tab-btn.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--ink3);margin-bottom:5px;letter-spacing:1px}
+.field input{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--border2);background:white}
+.err{color:var(--accent);font-size:12px;margin:6px 0;min-height:16px;text-align:center}
+.btn-enter{width:100%;padding:13px;border-radius:100px;background:var(--ink);color:white;border:none;cursor:pointer;font-size:14px;font-family:inherit;font-weight:500;transition:all .2s;margin-top:4px}
+.btn-enter:hover{background:var(--accent)}
+.btn-enter:disabled{opacity:.5;cursor:not-allowed}
+.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+.dash-sidebar{background:var(--surface);border-right:1px solid var(--border);padding:28px 20px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.dash-user{display:flex;align-items:center;gap:12px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.d-avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--sakura2),var(--sakura));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative;cursor:pointer;overflow:hidden}
+.d-avatar img{width:100%;height:100%;object-fit:cover}
+.d-avatar-overlay{position:absolute;inset:0;background:rgba(26,23,20,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:14px}
+.d-avatar:hover .d-avatar-overlay{opacity:1}
+.d-name{font-size:14px;font-weight:600}
+.d-plan{font-size:10px;color:var(--matcha);font-family:'Noto Sans JP',sans-serif;letter-spacing:1px}
+.d-change{font-size:10px;color:var(--ink3);margin-top:3px;cursor:pointer}
+.snav-label{font-size:9px;color:var(--ink3);letter-spacing:3px;margin:18px 0 6px 10px;font-family:'Noto Sans JP',sans-serif}
+.snav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;font-size:13px;color:var(--ink2);text-decoration:none;transition:all .2s;margin-bottom:2px}
+.snav a:hover{background:var(--bg);color:var(--ink)}
+.snav a.on{background:var(--bg2);color:var(--ink);font-weight:500}
+.dash-main{padding:32px;background:var(--bg)}
+.dash-greeting h2{font-family:'DM Serif Display',serif;font-size:26px;margin-bottom:4px}
+.dash-greeting p{font-size:13px;color:var(--ink2);font-weight:300;margin-bottom:24px}
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
+.metric-label{font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px;font-family:'Noto Sans JP',sans-serif}
+.metric-val{font-family:'DM Serif Display',serif;font-size:28px;line-height:1;margin-bottom:4px}
+.metric-sub{font-size:11px;color:var(--ink3)}
+.metric.green .metric-val{color:var(--matcha)}
+.config-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:16px}
+.config-box h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.config-box-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:20px}
+.cfg-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:12px;margin-bottom:8px}
+.ci-label{font-size:10px;color:var(--ink3);letter-spacing:1px;margin-bottom:3px}
+.ci-val{font-size:13px;font-weight:500;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ci-copy{padding:5px 12px;border-radius:100px;border:1px solid var(--border2);background:transparent;font-size:11px;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .2s;flex-shrink:0}
+.ci-copy:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.qr-row{display:flex;gap:20px;align-items:flex-start;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.qr-img{width:88px;height:88px;border-radius:12px;border:1px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;padding:6px;flex-shrink:0}
+.qr-img img{width:100%}
+.qr-desc p{font-size:12px;color:var(--ink2);line-height:1.8;margin-bottom:10px;font-weight:300}
+.prog-row{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:6px}
+.prog-track{height:4px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--matcha),var(--matcha2))}
+.no-sub{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px;text-align:center}
+.no-sub h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:8px}
+.no-sub p{font-size:13px;color:var(--ink2);margin-bottom:24px;font-weight:300;line-height:1.7}
+.admin-main{padding:32px;background:var(--bg)}
+.admin-hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}
+.admin-hdr h2{font-family:'DM Serif Display',serif;font-size:26px}
+.admin-hdr p{font-size:13px;color:var(--ink2);font-weight:300}
+.admin-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.am{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
+.am-label{font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px;font-family:'Noto Sans JP',sans-serif}
+.am-val{font-family:'DM Serif Display',serif;font-size:28px}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:16px}
+.tcard-hdr{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.tcard-hdr h3{font-size:15px;font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 20px;text-align:left;font-size:10px;color:var(--ink3);font-weight:500;letter-spacing:2px;border-bottom:1px solid var(--border)}
+td{padding:13px 20px;font-size:13px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.chip{display:inline-block;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:600;letter-spacing:1px}
+.chip-green{background:var(--matcha2);color:#2d6b31}
+.chip-red{background:#fde8e4;color:var(--accent)}
+.chip-yellow{background:#fef3d0;color:#9a6f1a}
+.act-btn{padding:4px 12px;border-radius:100px;border:1px solid var(--border2);background:transparent;font-size:11px;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .2s;margin-right:4px}
+.act-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-btn.ok{border-color:var(--matcha);color:var(--matcha)}
+.act-btn.ok:hover{background:var(--matcha);border-color:var(--matcha);color:white}
+.act-btn.del:hover{background:var(--accent);border-color:var(--accent);color:white}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:white;padding:12px 20px;border-radius:12px;font-size:13px;z-index:999;transform:translateY(80px);transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateY(0)}
+footer{background:var(--ink);color:rgba(255,255,255,.5);padding:28px 32px;display:flex;justify-content:space-between;align-items:center;font-size:12px;position:relative;z-index:1}
+.f-logo{font-family:'DM Serif Display',serif;font-size:18px;color:white}
+@media(max-width:860px){.hero{grid-template-columns:1fr;padding:40px 20px;min-height:auto;gap:32px}.plans{grid-template-columns:1fr}.dash-layout{grid-template-columns:1fr}.dash-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}.metric-row{grid-template-columns:1fr 1fr}.admin-metrics{grid-template-columns:1fr 1fr}nav{padding:0 16px}.section{padding:48px 20px}}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">domu<span>VPN</span></div>
+    <div class="modal-sub">ドムVPN · ยินดีต้อนรับ</div>
+    <div class="tab-row">
+      <button class="tab-btn on" onclick="switchTab(this,'login')">เข้าสู่ระบบ</button>
+      <button class="tab-btn" onclick="switchTab(this,'reg')">สมัครสมาชิก</button>
+    </div>
+    <div id="form-login">
+      <div class="field"><label>ชื่อผู้ใช้</label><input type="text" id="lu" placeholder="username" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>รหัสผ่าน</label><input type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="err" id="lerr"></div>
+      <button class="btn-enter" id="lbtn" onclick="doLogin()">เข้าสู่ระบบ →</button>
+    </div>
+    <div id="form-reg" style="display:none">
+      <div class="field"><label>ชื่อผู้ใช้</label><input type="text" id="ru" placeholder="username"></div>
+      <div class="field"><label>อีเมล</label><input type="email" id="re" placeholder="email@example.com"></div>
+      <div class="field"><label>รหัสผ่าน (อย่างน้อย 6 ตัว)</label><input type="password" id="rp" placeholder="••••••••"></div>
+      <div class="err" id="rerr"></div>
+      <button class="btn-enter" id="rbtn" onclick="doRegister()">สมัครสมาชิก →</button>
+    </div>
+  </div>
+</div>
+<nav>
+  <div class="logo">domu<span class="logo-dot">VPN</span><span class="logo-jp">ドムVPN</span></div>
+  <div class="nav-right" id="nav-right">
+    <button class="btn-text" onclick="openModal()">เข้าสู่ระบบ</button>
+    <button class="btn-pill" onclick="openModal()">สมัครฟรี</button>
+  </div>
+</nav>
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div>
+      <div class="hero-kana">ドムVPN · SECURE NETWORK</div>
+      <h1>เชื่อมต่อ<br><em>ไร้ขีดจำกัด</em></h1>
+      <div class="hero-sub-jp">自由に · 安全に · 高速に</div>
+      <p>VPN คุณภาพสูง ด้วย VLESS + Reality Protocol ปลอดภัย เสถียร รวดเร็ว รองรับทุกอุปกรณ์</p>
+      <div class="hero-actions">
+        <button class="btn-main" onclick="document.getElementById('pkg').scrollIntoView({behavior:'smooth'})">ดูแพ็กเกจ →</button>
+        <button class="btn-outline" onclick="requireLogin(()=>showPage('dash'))">ดู Dashboard</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center">
+      <div class="hero-card">
+        <div class="hc-top">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--sakura2),var(--sakura));display:flex;align-items:center;justify-content:center;font-size:18px">🌸</div>
+          <div><div style="font-size:14px;font-weight:500">domuVPN</div><div style="font-size:11px;color:var(--matcha);letter-spacing:1px">PRO PLAN</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:6px"><div class="hc-dot"></div><span style="font-size:11px;color:var(--matcha);font-weight:600">ACTIVE</span></div>
+        </div>
+        <div class="hc-stat-grid">
+          <div class="hc-stat"><div class="hc-stat-label">วันหมดอายุ</div><div class="hc-stat-val">30</div><div class="hc-stat-sub">วันที่เหลือ</div></div>
+          <div class="hc-stat"><div class="hc-stat-label">ความเร็ว</div><div class="hc-stat-val">500</div><div class="hc-stat-sub">Mbps</div></div>
+        </div>
+        <div class="hc-bar-label"><span>Data ใช้ไป</span><span>Unlimited</span></div>
+        <div class="hc-bar"><div class="hc-bar-fill"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="stats-inner">
+      <div class="stat-item"><div class="stat-num">99.9%</div><div><div class="stat-label">UPTIME</div><div class="stat-jp">稼働率</div></div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-num">1Gbps</div><div><div class="stat-label">PORT SPEED</div><div class="stat-jp">通信速度</div></div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-num" id="stat-users">—</div><div><div class="stat-label">USERS</div><div class="stat-jp">ユーザー数</div></div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-num">3</div><div><div class="stat-label">PROTOCOLS</div><div class="stat-jp">プロトコル</div></div></div>
+    </div>
+  </div>
+  <div class="section" id="pkg">
+    <div class="section-kana">プラン · PACKAGES</div>
+    <h2>เลือกแพ็กเกจที่เหมาะกับคุณ</h2>
+    <p>ราคาสบายกระเป๋า คุณภาพระดับพรีเมียม ไม่มีสัญญาผูกมัด</p>
+    <div class="plans" id="plans-grid"><div style="text-align:center;padding:40px;color:var(--ink3);grid-column:1/-1">กำลังโหลด...</div></div>
+  </div>
+  <div class="section" style="padding-top:0">
+    <div class="section-kana">とくちょう · FEATURES</div>
+    <h2>ทำไมต้อง domuVPN?</h2>
+    <p></p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px"><div style="font-size:28px;margin-bottom:12px">🔒</div><div style="font-weight:600;margin-bottom:4px">ปลอดภัยสูงสุด</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">セキュリティ</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">VLESS + Reality Protocol ทันสมัยที่สุด ตรวจจับไม่ได้</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px"><div style="font-size:28px;margin-bottom:12px">⚡</div><div style="font-weight:600;margin-bottom:4px">เร็วและเสถียร</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">高速・安定</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">Port 1 Gbps ดู YouTube 4K สตรีมเกมได้สบาย</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px"><div style="font-size:28px;margin-bottom:12px">🌸</div><div style="font-weight:600;margin-bottom:4px">ใช้ง่าย</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">使いやすい</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">สแกน QR เชื่อมต่อทันที รองรับทุกแพลตฟอร์ม</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px"><div style="font-size:28px;margin-bottom:12px">🎌</div><div style="font-weight:600;margin-bottom:4px">ซัพพอร์ตไทย</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">サポート</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">ทีมงานดูแล 24 ชั่วโมง ติดต่อผ่าน Line ได้เลย</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px"><div style="font-size:28px;margin-bottom:12px">💳</div><div style="font-weight:600;margin-bottom:4px">ชำระง่าย</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">お支払い</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">โอนผ่าน PromptPay Admin ยืนยันภายใน 5 นาที</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px"><div style="font-size:28px;margin-bottom:12px">📱</div><div style="font-weight:600;margin-bottom:4px">ทุกอุปกรณ์</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">マルチデバイス</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">Android, iOS, Windows, macOS, Linux รองรับหมด</p></div>
+    </div>
+  </div>
+  <footer><div class="f-logo">domu<span style="color:var(--sakura)">VPN</span></div><div>© 2025 domuVPN · Line: @domuvpn</div></footer>
+</div>
+<div class="page" id="page-dash">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-user">
+        <div class="d-avatar" onclick="document.getElementById('avi').click()">
+          <img id="avi-img" src="" style="display:none" alt="">
+          <span id="avi-emoji">🌸</span>
+          <div class="d-avatar-overlay">📷</div>
+          <input type="file" id="avi" accept="image/*" style="display:none" onchange="changeAvatar(this)">
+        </div>
+        <div>
+          <div class="d-name" id="d-username">—</div>
+          <div class="d-plan" id="d-plan">—</div>
+          <div class="d-change" onclick="document.getElementById('avi').click()">เปลี่ยนรูป ✎</div>
+        </div>
+      </div>
+      <div class="snav">
+        <div class="snav-label">メイン</div>
+        <a href="#" class="on">📊 ภาพรวม</a>
+        <a href="#" onclick="showPage('home');return false">📦 แพ็กเกจ</a>
+        <div class="snav-label">アカウント</div>
+        <a href="#" onclick="doLogout();return false">🚪 ออกจากระบบ</a>
+      </div>
+    </div>
+    <div class="dash-main">
+      <div class="dash-greeting">
+        <h2 id="d-greeting">สวัสดีครับ 🌸</h2>
+        <p>こんにちは · ข้อมูลการใช้งานของคุณ</p>
+      </div>
+      <div id="d-nosub" class="no-sub" style="display:none">
+        <div style="font-size:48px;margin-bottom:16px">🌸</div>
+        <h3>ยังไม่มีแพ็กเกจ</h3>
+        <p>เลือกแพ็กเกจที่เหมาะกับคุณ แล้วโอนเงินผ่าน PromptPay<br>Admin จะยืนยันภายใน 5 นาที</p>
+        <button class="btn-main" onclick="showPage('home');setTimeout(()=>document.getElementById('pkg').scrollIntoView({behavior:'smooth'}),100)">ดูแพ็กเกจ →</button>
+      </div>
+      <div id="d-hassub">
+        <div class="metric-row">
+          <div class="metric green"><div class="metric-label">สถานะ · ステータス</div><div class="metric-val" id="m-status">—</div><div class="metric-sub" id="m-plan-sub">—</div></div>
+          <div class="metric"><div class="metric-label">วันหมดอายุ · 有効期限</div><div class="metric-val" id="m-days">—</div><div class="metric-sub" id="m-exp-date">—</div></div>
+          <div class="metric"><div class="metric-label">แพ็กเกจ · プラン</div><div class="metric-val" id="m-pkg">—</div><div class="metric-sub">ใช้งานอยู่</div></div>
+        </div>
+        <div class="config-box">
+          <h3>🔑 Config & QR Code</h3>
+          <div class="config-box-jp">接続情報 · ข้อมูลการเชื่อมต่อ</div>
+          <div class="cfg-item"><div><div class="ci-label">ADDRESS</div><div class="ci-val" id="cfg-addr">shopdomu.duckdns.org</div></div><button class="ci-copy" onclick="doCopy(this,'cfg-addr')">copy</button></div>
+          <div class="cfg-item"><div><div class="ci-label">UUID</div><div class="ci-val" id="cfg-uuid">รอการยืนยันจาก Admin</div></div><button class="ci-copy" onclick="doCopy(this,'cfg-uuid')">copy</button></div>
+          <div class="cfg-item"><div><div class="ci-label">VLESS LINK</div><div class="ci-val" id="cfg-link" style="font-size:11px">—</div></div><button class="ci-copy" onclick="doCopy(this,'cfg-link')">copy</button></div>
+          <div class="qr-row">
+            <div class="qr-img"><img id="qr-img" src="" alt="QR"></div>
+            <div class="qr-desc"><p>สแกน QR ด้วย <strong>v2rayNG</strong>, <strong>Hiddify</strong> หรือ <strong>Streisand</strong> เพื่อเชื่อมต่อทันที</p></div>
+          </div>
+          <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+            <div class="prog-row"><span>Data เดือนนี้</span><span id="prog-label">Unlimited</span></div>
+            <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:20%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-admin">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-user">
+        <div class="d-avatar">⚙️</div>
+        <div><div class="d-name">Admin</div><div class="d-plan">ADMINISTRATOR · 管理者</div></div>
+      </div>
+      <div class="snav">
+        <div class="snav-label">管理</div>
+        <a href="#" class="on">👥 จัดการ User</a>
+        <a href="#" onclick="showPage('home');return false">← กลับหน้าหลัก</a>
+        <div class="snav-label">アカウント</div>
+        <a href="#" onclick="doLogout();return false">🚪 ออกจากระบบ</a>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-hdr">
+        <div><h2>Admin Panel</h2><p>管理パネル · จัดการระบบทั้งหมด</p></div>
+        <button class="btn-pill" onclick="loadAdmin()">🔄 รีเฟรช</button>
+      </div>
+      <div class="admin-metrics">
+        <div class="am"><div class="am-label">USER ทั้งหมด</div><div class="am-val" id="a-users">—</div></div>
+        <div class="am"><div class="am-label">ACTIVE</div><div class="am-val" style="color:var(--matcha)" id="a-active">—</div></div>
+        <div class="am"><div class="am-label">รอยืนยัน</div><div class="am-val" style="color:#c4a35a" id="a-pending">—</div></div>
+        <div class="am"><div class="am-label">รายได้รวม</div><div class="am-val" style="color:var(--accent)" id="a-revenue">—</div></div>
+      </div>
+      <div class="tcard">
+        <div class="tcard-hdr"><h3>📋 คำสั่งซื้อรอยืนยัน</h3></div>
+        <table><thead><tr><th>#</th><th>USER ID</th><th>แพ็กเกจ</th><th>ราคา</th><th>ACTION</th></tr></thead>
+        <tbody id="tb-orders"><tr><td colspan="5" style="text-align:center;color:var(--ink3);padding:24px">กำลังโหลด...</td></tr></tbody></table>
+      </div>
+      <div class="tcard">
+        <div class="tcard-hdr"><h3>👥 ผู้ใช้งานทั้งหมด</h3></div>
+        <table><thead><tr><th>USERNAME</th><th>EMAIL</th><th>แพ็กเกจ</th><th>หมดอายุ</th><th>สถานะ</th></tr></thead>
+        <tbody id="tb-users"><tr><td colspan="5" style="text-align:center;color:var(--ink3);padding:24px">กำลังโหลด...</td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const API='';
+let token=localStorage.getItem('token');
+let me=null;
+
+function toast(msg,dur=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
+function openModal(){document.getElementById('overlay').classList.add('open')}
+function closeModal(){document.getElementById('overlay').classList.remove('open')}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+function switchTab(el,id){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');document.getElementById('form-login').style.display=id==='login'?'':'none';document.getElementById('form-reg').style.display=id==='reg'?'':'none'}
+function showPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');window.scrollTo(0,0);if(name==='dash')loadDash();if(name==='admin')loadAdmin()}
+function requireLogin(cb){if(token)cb();else openModal()}
+
+function updateNav(){
+  const nr=document.getElementById('nav-right');
+  if(token&&me){
+    nr.innerHTML=me.is_admin
+      ?`<button class="btn-text" onclick="showPage('admin')">⚙️ Admin</button><button class="btn-text" onclick="showPage('dash')">Dashboard</button><button class="btn-pill" onclick="doLogout()">ออกจากระบบ</button>`
+      :`<button class="btn-text" onclick="showPage('dash')">Dashboard</button><button class="btn-pill" onclick="doLogout()">ออกจากระบบ</button>`;
+  }else{
+    nr.innerHTML=`<button class="btn-text" onclick="openModal()">เข้าสู่ระบบ</button><button class="btn-pill" onclick="openModal()">สมัครฟรี</button>`;
+  }
+}
+
+async function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  if(!u||!p){document.getElementById('lerr').textContent='กรุณากรอกข้อมูลให้ครบ';return}
+  const btn=document.getElementById('lbtn');
+  btn.disabled=true;btn.textContent='กำลังเข้าสู่ระบบ...';
+  document.getElementById('lerr').textContent='';
+  try{
+    const r=await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!r.ok){document.getElementById('lerr').textContent=d.detail||'เกิดข้อผิดพลาด';return}
+    token=d.access_token;localStorage.setItem('token',token);me=d.user;
+    closeModal();updateNav();
+    if(me.is_admin)showPage('admin');else showPage('dash');
+  }catch(e){document.getElementById('lerr').textContent='เชื่อมต่อไม่ได้'}
+  finally{btn.disabled=false;btn.textContent='เข้าสู่ระบบ →'}
+}
+
+async function doRegister(){
+  const u=document.getElementById('ru').value.trim();
+  const e=document.getElementById('re').value.trim();
+  const p=document.getElementById('rp').value;
+  if(!u||!e||!p){document.getElementById('rerr').textContent='กรุณากรอกข้อมูลให้ครบ';return}
+  if(p.length<6){document.getElementById('rerr').textContent='รหัสผ่านต้องมีอย่างน้อย 6 ตัว';return}
+  const btn=document.getElementById('rbtn');
+  btn.disabled=true;btn.textContent='กำลังสมัคร...';
+  document.getElementById('rerr').textContent='';
+  try{
+    const r=await fetch(API+'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,email:e,password:p})});
+    const d=await r.json();
+    if(!r.ok){document.getElementById('rerr').textContent=d.detail||'เกิดข้อผิดพลาด';return}
+    token=d.access_token;localStorage.setItem('token',token);me=d.user;
+    closeModal();updateNav();showPage('dash');
+  }catch(e){document.getElementById('rerr').textContent='เชื่อมต่อไม่ได้'}
+  finally{btn.disabled=false;btn.textContent='สมัครสมาชิก →'}
+}
+
+function doLogout(){token=null;me=null;localStorage.removeItem('token');updateNav();showPage('home')}
+
+async function loadMe(){
+  if(!token)return;
+  try{
+    const r=await fetch(API+'/api/me',{headers:{'Authorization':'Bearer '+token}});
+    if(!r.ok){doLogout();return}
+    me=await r.json();updateNav();
+  }catch(e){}
+}
+
+async function loadDash(){
+  if(!token){openModal();return}
+  await loadMe();
+  if(!me)return;
+  document.getElementById('d-username').textContent=me.username;
+  document.getElementById('d-greeting').textContent='สวัสดีครับ '+me.username+' 🌸';
+  const sub=me.subscription;
+  if(!sub||!sub.is_active){
+    document.getElementById('d-nosub').style.display='';
+    document.getElementById('d-hassub').style.display='none';
+    document.getElementById('d-plan').textContent='ยังไม่มีแพ็กเกจ';
+  }else{
+    document.getElementById('d-nosub').style.display='none';
+    document.getElementById('d-hassub').style.display='';
+    document.getElementById('d-plan').textContent=sub.plan.toUpperCase()+' · アクティブ';
+    document.getElementById('m-status').textContent='ACTIVE';
+    document.getElementById('m-plan-sub').textContent=sub.plan+' Plan';
+    document.getElementById('m-pkg').textContent=sub.plan.toUpperCase();
+    const exp=new Date(sub.expires_at);
+    const days=Math.max(0,Math.ceil((exp-new Date())/86400000));
+    document.getElementById('m-days').textContent=days+' วัน';
+    document.getElementById('m-exp-date').textContent='หมด '+exp.toLocaleDateString('th-TH');
+    if(sub.xui_uuid){
+      document.getElementById('cfg-uuid').textContent=sub.xui_uuid;
+      const link='vless://'+sub.xui_uuid+'@shopdomu.duckdns.org:2545?type=tcp&security=reality';
+      document.getElementById('cfg-link').textContent=link;
+      document.getElementById('qr-img').src='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(link)+'&size=88x88&bgcolor=ffffff&color=1a1714';
+    }
+  }
+}
+
+async function loadPackages(){
+  try{
+    const r=await fetch(API+'/api/packages');
+    const pkgs=await r.json();
+    const seasons=['はる · SPRING','なつ · SUMMER','あき · AUTUMN'];
+    const icons=['🌸','⛩️','🍁'];
+    const jp={basic:'ベーシック',pro:'プロ · แนะนำ',ultra:'ウルトラ'};
+    document.getElementById('plans-grid').innerHTML=pkgs.map((p,i)=>`
+      <div class="plan ${p.id==='pro'?'featured':''}" onclick="requireLogin(()=>orderPlan('${p.id}'))">
+        <div class="plan-season">${seasons[i]||''}</div>
+        <div class="plan-icon">${icons[i]||'🌸'}</div>
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-name-jp">${jp[p.id]||''}</div>
+        <div class="plan-price-row"><span style="font-size:16px">฿</span><div class="plan-price">${p.price}</div><div class="plan-period">/ เดือน</div></div>
+        <div class="plan-div"></div>
+        <ul class="plan-features">
+          <li><div class="feat-dot"></div>${p.data_gb===-1?'Unlimited Data':p.data_gb+' GB / เดือน'}</li>
+          <li><div class="feat-dot"></div>ความเร็วสูงสุด ${p.speed_mbps} Mbps</li>
+          <li><div class="feat-dot"></div>${p.devices} อุปกรณ์</li>
+          <li><div class="feat-dot"></div>${p.protocol}</li>
+        </ul>
+        <button class="plan-btn">เลือกแพ็กเกจนี้</button>
+      </div>`).join('');
+  }catch(e){document.getElementById('plans-grid').innerHTML='<div style="text-align:center;padding:40px;color:var(--ink3);grid-column:1/-1">โหลดไม่ได้ กรุณารีเฟรช</div>'}
+}
+
+async function orderPlan(plan){
+  if(!token){openModal();return}
+  try{
+    const r=await fetch(API+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan})});
+    const d=await r.json();
+    if(!r.ok){toast('❌ '+d.detail);return}
+    toast('✅ สร้างคำสั่งซื้อแล้ว! รอ Admin ยืนยัน Slip');
+    showPage('dash');
+  }catch(e){toast('เกิดข้อผิดพลาด')}
+}
+
+async function loadAdmin(){
+  if(!token)return;
+  try{
+    const [sR,uR,oR]=await Promise.all([
+      fetch(API+'/api/admin/stats',{headers:{'Authorization':'Bearer '+token}}),
+      fetch(API+'/api/admin/users',{headers:{'Authorization':'Bearer '+token}}),
+      fetch(API+'/api/admin/orders',{headers:{'Authorization':'Bearer '+token}})
+    ]);
+    if(!sR.ok)return;
+    const s=await sR.json();
+    document.getElementById('a-users').textContent=s.total_users||0;
+    document.getElementById('a-active').textContent=s.active_subs||0;
+    document.getElementById('a-pending').textContent=s.pending_orders||0;
+    document.getElementById('a-revenue').textContent='฿'+(s.revenue||0).toLocaleString();
+    const users=await uR.json();
+    document.getElementById('tb-users').innerHTML=users.length?users.map(u=>`
+      <tr>
+        <td style="font-weight:500">${u.username}</td>
+        <td style="color:var(--ink3);font-size:12px">${u.email}</td>
+        <td>${u.subscription?u.subscription.plan:'—'}</td>
+        <td>${u.subscription?new Date(u.subscription.expires_at).toLocaleDateString('th-TH'):'—'}</td>
+        <td><span class="chip ${u.subscription?'chip-green':'chip-red'}">${u.subscription?'ACTIVE':'NO PLAN'}</span></td>
+      </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--ink3);padding:24px">ยังไม่มีผู้ใช้งาน</td></tr>';
+    const orders=await oR.json();
+    const pending=orders.filter(o=>o.status==='pending');
+    document.getElementById('tb-orders').innerHTML=pending.length?pending.map(o=>`
+      <tr>
+        <td>#${o.id}</td>
+        <td>user #${o.user_id}</td>
+        <td>${o.plan}</td>
+        <td>฿${o.amount}</td>
+        <td><button class="act-btn ok" onclick="approveOrder(${o.id})">✓ อนุมัติ</button></td>
+      </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--ink3);padding:24px">ไม่มีคำสั่งซื้อที่รอยืนยัน 🌸</td></tr>';
+  }catch(e){console.error(e)}
+}
+
+async function approveOrder(id){
+  try{
+    const r=await fetch(API+'/api/admin/orders/'+id+'/approve',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    if(r.ok){toast('✅ อนุมัติแล้ว!');loadAdmin()}
+    else toast('❌ เกิดข้อผิดพลาด')
+  }catch(e){toast('เกิดข้อผิดพลาด')}
+}
+
+function changeAvatar(input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('avi-img');
+    document.getElementById('avi-emoji').style.display='none';
+    img.src=e.target.result;img.style.display='block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function doCopy(btn,elId){
+  const text=document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(text).catch(()=>{});
+  const o=btn.textContent;
+  btn.textContent='✓ copied';btn.style.background='var(--matcha)';btn.style.color='white';btn.style.borderColor='var(--matcha)';
+  setTimeout(()=>{btn.textContent=o;btn.style.background='';btn.style.color='';btn.style.borderColor=''},1500);
+}
+
+async function loadStats(){
+  try{
+    const r=await fetch(API+'/api/admin/stats',{headers:{'Authorization':'Bearer '+(token||'')}});
+    if(r.ok){const d=await r.json();document.getElementById('stat-users').textContent=d.total_users||'—'}
+  }catch(e){}
+}
+
+(async()=>{
+  if(token)await loadMe();
+  updateNav();
+  loadPackages();
+  loadStats();
+})();
+</script>
+</body>
+</html>
