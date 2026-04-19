@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>domuVPN</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+Thai:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf8f5;--bg2:#f4f0eb;--surface:#fff;--border:#e8e2d9;--border2:#d4cdc2;--ink:#1a1714;--ink2:#6b6560;--ink3:#a09890;--sakura:#e8b4b8;--sakura2:#f2d4d6;--matcha:#7ea882;--matcha2:#c8ddc9;--accent:#c9614a;--gold:#c4a35a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Noto Sans Thai','Noto Sans JP',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23c4a35a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(250,248,245,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:baseline;gap:6px;font-family:'DM Serif Display',serif;font-size:20px;color:var(--ink);text-decoration:none}
+.logo-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:300;color:var(--ink3);letter-spacing:3px;align-self:center;margin-left:2px}
+.logo-dot{color:var(--accent)}
+.nav-right{display:flex;gap:8px;align-items:center}
+.btn-text{background:none;border:none;cursor:pointer;font-size:13px;color:var(--ink2);font-family:inherit;padding:6px 12px;border-radius:6px;transition:all .2s}
+.btn-text:hover{color:var(--ink);background:var(--bg2)}
+.btn-pill{background:var(--ink);color:var(--bg);border:none;cursor:pointer;font-size:13px;font-family:inherit;padding:8px 20px;border-radius:100px;transition:all .2s}
+.btn-pill:hover{background:var(--accent);transform:translateY(-1px)}
+.page{display:none;position:relative;z-index:1}
+.page.active{display:block}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 60px);max-width:1100px;margin:0 auto;padding:0 32px;align-items:center;gap:60px}
+.hero-kana{font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:300;color:var(--ink3);letter-spacing:6px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.hero-kana::before{content:'';display:block;width:24px;height:1px;background:var(--ink3)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(40px,5vw,64px);line-height:1.1;letter-spacing:-1px;margin-bottom:8px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-sub-jp{font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:300;color:var(--ink3);letter-spacing:2px;margin-bottom:24px}
+.hero p{font-size:15px;line-height:1.8;color:var(--ink2);max-width:380px;margin-bottom:36px;font-weight:300}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-main{background:var(--ink);color:var(--bg);border:none;cursor:pointer;font-size:14px;font-family:inherit;padding:13px 28px;border-radius:100px;transition:all .25s}
+.btn-main:hover{background:var(--accent);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--ink2);border:1px solid var(--border2);cursor:pointer;font-size:13px;font-family:inherit;padding:12px 24px;border-radius:100px;transition:all .25s}
+.btn-outline:hover{border-color:var(--ink);color:var(--ink)}
+.hero-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px;width:300px;box-shadow:0 4px 40px rgba(0,0,0,0.06)}
+.hc-top{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.hc-dot{width:6px;height:6px;border-radius:50%;background:var(--matcha);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hc-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.hc-stat{background:var(--bg);border-radius:12px;padding:14px}
+.hc-stat-label{font-size:10px;color:var(--ink3);margin-bottom:4px;letter-spacing:1px}
+.hc-stat-val{font-size:20px;font-weight:700}
+.hc-stat-sub{font-size:10px;color:var(--ink3)}
+.hc-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:6px}
+.hc-bar{height:4px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.hc-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--matcha),var(--matcha2));width:30%}
+
+/* STATS STRIP */
+.stats-strip{background:var(--ink);padding:20px 0;position:relative;z-index:1}
+.stats-inner{max-width:1100px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.stat-item{display:flex;align-items:center;gap:14px}
+.stat-num{font-family:'DM Serif Display',serif;font-size:28px;color:white}
+.stat-label{font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:1px}
+.stat-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:rgba(255,255,255,0.3)}
+.stat-divider{width:1px;height:32px;background:rgba(255,255,255,0.1)}
+
+/* SECTION */
+.section{max-width:1100px;margin:0 auto;padding:72px 32px}
+.section-kana{font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:300;color:var(--ink3);letter-spacing:6px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.section-kana::before{content:'';display:block;width:20px;height:1px;background:var(--ink3)}
+.section h2{font-family:'DM Serif Display',serif;font-size:34px;letter-spacing:-0.5px;margin-bottom:8px}
+.section>p{font-size:14px;color:var(--ink2);margin-bottom:40px;font-weight:300}
+
+/* PLANS */
+.plans{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.plan-type-label{grid-column:1/-1;display:flex;align-items:center;gap:12px;margin-top:8px}
+.plan-type-label span{font-size:11px;color:var(--ink3);letter-spacing:3px;font-family:'Noto Sans JP',sans-serif}
+.plan-type-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.plan{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;transition:all .3s;cursor:pointer;position:relative}
+.plan:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,0.08);border-color:var(--border2)}
+.plan.featured{background:var(--ink);color:white;border-color:var(--ink)}
+.plan.game{border-left:3px solid var(--gold)}
+.plan-badge{position:absolute;top:16px;right:16px;font-size:10px;padding:3px 10px;border-radius:100px;font-weight:600;letter-spacing:1px}
+.plan-badge.normal{background:var(--matcha2);color:#2d6b31}
+.plan-badge.game{background:#fef3d0;color:#9a6f1a}
+.plan-icon{font-size:24px;margin-bottom:16px}
+.plan-name{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:4px}
+.plan-name-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;letter-spacing:3px;margin-bottom:16px;opacity:.5}
+.plan-price-row{display:flex;align-items:baseline;gap:4px;margin-bottom:8px}
+.plan-price{font-family:'DM Serif Display',serif;font-size:36px;line-height:1}
+.plan-period{font-size:12px;font-weight:300;opacity:.6}
+.plan-proto{font-size:11px;margin-bottom:20px;opacity:.6;font-family:'Noto Sans JP',sans-serif;letter-spacing:1px}
+.plan-div{height:1px;margin-bottom:16px}
+.plan:not(.featured) .plan-div{background:var(--border)}
+.plan.featured .plan-div{background:rgba(255,255,255,.1)}
+.plan-btn{width:100%;padding:11px;border-radius:100px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;transition:all .2s}
+.plan:not(.featured) .plan-btn{background:var(--bg);border:1px solid var(--border2);color:var(--ink)}
+.plan:not(.featured) .plan-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.plan.featured .plan-btn{background:white;color:var(--ink);border:none}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(26,23,20,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px;width:100%;max-width:380px;margin:16px;transform:translateY(16px) scale(.98);transition:transform .3s;position:relative;max-height:90vh;overflow-y:auto}
+.overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--bg2);border:none;cursor:pointer;width:28px;height:28px;border-radius:50%;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:var(--border2)}
+.modal-logo{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:4px}
+.modal-logo span{color:var(--accent)}
+.modal-sub{font-size:12px;color:var(--ink3);letter-spacing:2px;font-family:'Noto Sans JP',sans-serif;font-weight:300;margin-bottom:24px}
+.tab-row{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:20px;gap:4px}
+.tab-btn{flex:1;padding:8px;border-radius:8px;font-size:13px;font-family:inherit;border:none;background:transparent;color:var(--ink2);cursor:pointer;transition:all .2s;font-weight:500}
+.tab-btn.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--ink3);margin-bottom:5px;letter-spacing:1px}
+.field input,.field textarea,.field select{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.field input:focus,.field textarea:focus{border-color:var(--border2);background:white}
+.field textarea{resize:vertical;min-height:80px;font-size:13px}
+.err{color:var(--accent);font-size:12px;margin:6px 0;min-height:16px;text-align:center}
+.btn-enter{width:100%;padding:13px;border-radius:100px;background:var(--ink);color:white;border:none;cursor:pointer;font-size:14px;font-family:inherit;font-weight:500;transition:all .2s;margin-top:4px}
+.btn-enter:hover{background:var(--accent)}
+.btn-enter:disabled{opacity:.5;cursor:not-allowed}
+
+/* DASHBOARD */
+.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+.dash-sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;display:flex;flex-direction:column}
+.dash-user{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.d-avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--sakura2),var(--sakura));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative;cursor:pointer;overflow:hidden}
+.d-avatar img{width:100%;height:100%;object-fit:cover}
+.d-avatar-overlay{position:absolute;inset:0;background:rgba(26,23,20,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:14px}
+.d-avatar:hover .d-avatar-overlay{opacity:1}
+.d-name{font-size:14px;font-weight:600;line-height:1.3}
+.d-plan{font-size:10px;color:var(--matcha);font-family:'Noto Sans JP',sans-serif;letter-spacing:1px;margin-top:2px}
+.d-change{font-size:10px;color:var(--ink3);margin-top:3px;cursor:pointer}
+.snav-label{font-size:9px;color:var(--ink3);letter-spacing:3px;margin:16px 0 6px 10px;font-family:'Noto Sans JP',sans-serif}
+.snav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;font-size:13px;color:var(--ink2);text-decoration:none;transition:all .2s;margin-bottom:2px;cursor:pointer}
+.snav a:hover{background:var(--bg);color:var(--ink)}
+.snav a.on{background:var(--bg2);color:var(--ink);font-weight:500}
+.dash-main{padding:28px 32px;background:var(--bg);min-width:0}
+.dash-greeting h2{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:4px}
+.dash-greeting p{font-size:13px;color:var(--ink2);font-weight:300;margin-bottom:24px}
+
+/* TABS INSIDE DASH */
+.dash-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:4px;margin-bottom:24px;width:fit-content}
+.dash-tab{padding:8px 16px;border-radius:10px;font-size:13px;font-family:inherit;border:none;background:transparent;color:var(--ink2);cursor:pointer;transition:all .2s;font-weight:500}
+.dash-tab.on{background:var(--ink);color:white}
+
+/* METRIC CARDS */
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px}
+.metric-label{font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:8px;font-family:'Noto Sans JP',sans-serif}
+.metric-val{font-family:'DM Serif Display',serif;font-size:26px;line-height:1;margin-bottom:4px}
+.metric-sub{font-size:11px;color:var(--ink3)}
+.metric.green .metric-val{color:var(--matcha)}
+.metric.red .metric-val{color:var(--accent)}
+.metric.gold .metric-val{color:var(--gold)}
+
+/* CONFIG BOX */
+.box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px}
+.box-title{font-size:15px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.box-jp{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:18px}
+.cfg-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border-radius:12px;margin-bottom:8px;gap:12px}
+.ci-label{font-size:10px;color:var(--ink3);letter-spacing:1px;margin-bottom:3px}
+.ci-val{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+.ci-copy{padding:5px 12px;border-radius:100px;border:1px solid var(--border2);background:transparent;font-size:11px;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .2s;flex-shrink:0}
+.ci-copy:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.qr-row{display:flex;gap:20px;align-items:flex-start;margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
+.qr-img{width:88px;height:88px;border-radius:12px;border:1px solid var(--border);background:white;padding:6px;flex-shrink:0}
+.qr-img img{width:100%}
+.qr-desc p{font-size:12px;color:var(--ink2);line-height:1.8;margin-bottom:10px;font-weight:300}
+.prog-row{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-bottom:6px;margin-top:18px}
+.prog-track{height:5px;background:var(--bg2);border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--matcha),var(--matcha2));transition:width .5s ease}
+
+/* NO SUB */
+.no-sub{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:48px;text-align:center}
+.no-sub h3{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:8px}
+.no-sub p{font-size:13px;color:var(--ink2);margin-bottom:24px;font-weight:300;line-height:1.7}
+
+/* CHECK EXPIRY */
+.check-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px}
+.check-result{margin-top:16px;padding:16px;background:var(--bg);border-radius:12px;display:none}
+.check-result.show{display:block}
+.check-result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.check-result-row:last-child{border-bottom:none}
+.check-result-row .label{color:var(--ink3);font-size:11px;letter-spacing:1px}
+.check-result-row .val{font-weight:600}
+.val.ok{color:var(--matcha)}
+.val.warn{color:var(--gold)}
+.val.expired{color:var(--accent)}
+
+/* ADMIN */
+.admin-main{padding:28px 32px;background:var(--bg)}
+.admin-hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}
+.admin-hdr h2{font-family:'DM Serif Display',serif;font-size:24px}
+.admin-hdr p{font-size:13px;color:var(--ink2);font-weight:300}
+.admin-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.am{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px}
+.am-label{font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:8px;font-family:'Noto Sans JP',sans-serif}
+.am-val{font-family:'DM Serif Display',serif;font-size:26px}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:16px}
+.tcard-hdr{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.tcard-hdr h3{font-size:14px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 18px;text-align:left;font-size:10px;color:var(--ink3);font-weight:500;letter-spacing:2px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 18px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.chip{display:inline-block;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:600;letter-spacing:1px;white-space:nowrap}
+.chip-green{background:var(--matcha2);color:#2d6b31}
+.chip-red{background:#fde8e4;color:var(--accent)}
+.chip-yellow{background:#fef3d0;color:#9a6f1a}
+.chip-blue{background:#e0f0ff;color:#2563eb}
+.act-btn{padding:4px 12px;border-radius:100px;border:1px solid var(--border2);background:transparent;font-size:11px;color:var(--ink2);cursor:pointer;font-family:inherit;transition:all .2s;margin-right:4px;white-space:nowrap}
+.act-btn:hover{background:var(--ink);color:white;border-color:var(--ink)}
+.act-btn.ok{border-color:var(--matcha);color:var(--matcha)}
+.act-btn.ok:hover{background:var(--matcha);border-color:var(--matcha);color:white}
+.act-btn.del:hover{background:var(--accent);border-color:var(--accent);color:white}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:white;padding:12px 20px;border-radius:12px;font-size:13px;z-index:999;transform:translateY(80px);transition:transform .3s;pointer-events:none;max-width:280px}
+.toast.show{transform:translateY(0)}
+footer{background:var(--ink);color:rgba(255,255,255,.5);padding:28px 32px;display:flex;justify-content:space-between;align-items:center;font-size:12px;position:relative;z-index:1}
+.f-logo{font-family:'DM Serif Display',serif;font-size:18px;color:white}
+
+@media(max-width:860px){
+  .hero{grid-template-columns:1fr;padding:40px 20px;min-height:auto;gap:32px}
+  .plans{grid-template-columns:1fr}
+  .dash-layout{grid-template-columns:1fr}
+  .dash-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .metric-row{grid-template-columns:1fr 1fr}
+  .admin-metrics{grid-template-columns:1fr 1fr}
+  nav{padding:0 16px}
+  .section{padding:48px 20px}
+  .dash-main,.admin-main{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">domu<span>VPN</span></div>
+    <div class="modal-sub">ドムVPN · ยินดีต้อนรับ</div>
+    <div class="tab-row">
+      <button class="tab-btn on" onclick="switchTab(this,'login')">เข้าสู่ระบบ</button>
+      <button class="tab-btn" onclick="switchTab(this,'reg')">สมัครสมาชิก</button>
+    </div>
+    <div id="form-login">
+      <div class="field"><label>ชื่อผู้ใช้</label><input type="text" id="lu" placeholder="username" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>รหัสผ่าน</label><input type="password" id="lp" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="err" id="lerr"></div>
+      <button class="btn-enter" id="lbtn" onclick="doLogin()">เข้าสู่ระบบ →</button>
+    </div>
+    <div id="form-reg" style="display:none">
+      <div class="field"><label>ชื่อผู้ใช้</label><input type="text" id="ru" placeholder="username"></div>
+      <div class="field"><label>อีเมล</label><input type="email" id="re" placeholder="email@example.com"></div>
+      <div class="field"><label>รหัสผ่าน (อย่างน้อย 6 ตัว)</label><input type="password" id="rp" placeholder="••••••••"></div>
+      <div class="err" id="rerr"></div>
+      <button class="btn-enter" id="rbtn" onclick="doRegister()">สมัครสมาชิก →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#" onclick="showPage('home');return false">domu<span class="logo-dot">VPN</span><span class="logo-jp">ドムVPN</span></a>
+  <div class="nav-right" id="nav-right">
+    <button class="btn-text" onclick="openModal()">เข้าสู่ระบบ</button>
+    <button class="btn-pill" onclick="openModal()">สมัครฟรี</button>
+  </div>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div>
+      <div class="hero-kana">ドムVPN · SECURE NETWORK</div>
+      <h1>เชื่อมต่อ<br><em>ไร้ขีดจำกัด</em></h1>
+      <div class="hero-sub-jp">自由に · 安全に · 高速に</div>
+      <p>VPN คุณภาพสูง ปลอดภัย เสถียร รวดเร็ว รองรับทุกอุปกรณ์ ทั้งดูหนังและเล่นเกม</p>
+      <div class="hero-actions">
+        <button class="btn-main" onclick="document.getElementById('pkg').scrollIntoView({behavior:'smooth'})">ดูแพ็กเกจ →</button>
+        <button class="btn-outline" onclick="requireLogin(()=>showPage('dash'))">ดู Dashboard</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center">
+      <div class="hero-card">
+        <div class="hc-top">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--sakura2),var(--sakura));display:flex;align-items:center;justify-content:center;font-size:18px">🌸</div>
+          <div><div style="font-size:14px;font-weight:500">domuVPN</div><div style="font-size:11px;color:var(--matcha);letter-spacing:1px">ACTIVE</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:6px"><div class="hc-dot"></div><span style="font-size:11px;color:var(--matcha);font-weight:600">CONNECTED</span></div>
+        </div>
+        <div class="hc-stat-grid">
+          <div class="hc-stat"><div class="hc-stat-label">วันหมดอายุ</div><div class="hc-stat-val">30</div><div class="hc-stat-sub">วันที่เหลือ</div></div>
+          <div class="hc-stat"><div class="hc-stat-label">ราคาเริ่มต้น</div><div class="hc-stat-val">55฿</div><div class="hc-stat-sub">ต่อเดือน</div></div>
+        </div>
+        <div class="hc-bar-label"><span>เสถียรภาพ</span><span>99.9%</span></div>
+        <div class="hc-bar"><div class="hc-bar-fill" style="width:99%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stats-inner">
+      <div class="stat-item"><div class="stat-num">99.9%</div><div><div class="stat-label">UPTIME</div><div class="stat-jp">稼働率</div></div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-num">1Gbps</div><div><div class="stat-label">PORT SPEED</div><div class="stat-jp">通信速度</div></div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-num" id="stat-users">—</div><div><div class="stat-label">USERS</div><div class="stat-jp">ユーザー数</div></div></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><div class="stat-num">55฿</div><div><div class="stat-label">START FROM</div><div class="stat-jp">最安値</div></div></div>
+    </div>
+  </div>
+
+  <div class="section" id="pkg">
+    <div class="section-kana">プラン · PACKAGES</div>
+    <h2>เลือกแพ็กเกจที่ใช่</h2>
+    <p>ไม่มีสัญญาผูกมัด ยิ่งนานยิ่งคุ้ม</p>
+    <div class="plans" id="plans-grid">
+      <div style="text-align:center;padding:40px;color:var(--ink3);grid-column:1/-1">กำลังโหลด...</div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0">
+    <div class="section-kana">とくちょう · FEATURES</div>
+    <h2>ทำไมต้อง domuVPN?</h2>
+    <p></p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px"><div style="font-size:26px;margin-bottom:12px">🔒</div><div style="font-weight:600;margin-bottom:4px;font-size:15px">ปลอดภัยสูงสุด</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">セキュリティ</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">VLESS + Trojan Protocol ทันสมัย ตรวจจับไม่ได้</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px"><div style="font-size:26px;margin-bottom:12px">🎮</div><div style="font-weight:600;margin-bottom:4px;font-size:15px">เล่นเกมลื่น</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">ゲーム特化</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">แพ็กเกจเกมพิเศษ Trojan Protocol ping ต่ำ lag น้อย</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px"><div style="font-size:26px;margin-bottom:12px">🌸</div><div style="font-weight:600;margin-bottom:4px;font-size:15px">ใช้ง่าย</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">使いやすい</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">สแกน QR เชื่อมต่อทันที รองรับ v2rayNG, Hiddify</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px"><div style="font-size:26px;margin-bottom:12px">💳</div><div style="font-weight:600;margin-bottom:4px;font-size:15px">ชำระง่าย</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">お支払い</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">โอนผ่าน PromptPay Admin ยืนยันภายใน 5 นาที</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px"><div style="font-size:26px;margin-bottom:12px">📱</div><div style="font-weight:600;margin-bottom:4px;font-size:15px">ทุกอุปกรณ์</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">マルチデバイス</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">Android, iOS, Windows, macOS, Linux ครบ</p></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px"><div style="font-size:26px;margin-bottom:12px">⏱️</div><div style="font-weight:600;margin-bottom:4px;font-size:15px">เช็คอายุได้เอง</div><div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ink3);letter-spacing:2px;margin-bottom:10px">期限チェック</div><p style="font-size:13px;color:var(--ink2);line-height:1.7;font-weight:300">วางลิงก์ VLESS/Trojan เช็คอายุได้ทันที ไม่ต้องถามแอดมิน</p></div>
+    </div>
+  </div>
+  <footer><div class="f-logo">domu<span style="color:var(--sakura)">VPN</span></div><div>© 2025 domuVPN · Line: @domuvpn</div></footer>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="page" id="page-dash">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-user">
+        <div class="d-avatar" onclick="document.getElementById('avi').click()" title="เปลี่ยนรูป">
+          <img id="avi-img" src="" style="display:none" alt="">
+          <span id="avi-emoji">🌸</span>
+          <div class="d-avatar-overlay">📷</div>
+          <input type="file" id="avi" accept="image/*" style="display:none" onchange="changeAvatar(this)">
+        </div>
+        <div>
+          <div class="d-name" id="d-username">—</div>
+          <div class="d-plan" id="d-plan">—</div>
+          <div class="d-change" onclick="document.getElementById('avi').click()">เปลี่ยนรูป ✎</div>
+        </div>
+      </div>
+      <div class="snav">
+        <div class="snav-label">メイン</div>
+        <a id="tab-overview" class="on" onclick="switchDashTab('overview')">📊 ภาพรวม</a>
+        <a id="tab-config" onclick="switchDashTab('config')">🔑 Config & QR</a>
+        <a id="tab-check" onclick="switchDashTab('check')">⏱️ เช็คอายุ</a>
+        <a id="tab-order" onclick="switchDashTab('order')">📦 สั่งซื้อ</a>
+        <div class="snav-label">アカウント</div>
+        <a onclick="doLogout()">🚪 ออกจากระบบ</a>
+        <a onclick="showPage('home')">← หน้าหลัก</a>
+      </div>
+    </div>
+
+    <div class="dash-main">
+      <div class="dash-greeting">
+        <h2 id="d-greeting">สวัสดีครับ 🌸</h2>
+        <p id="d-greeting-sub">こんにちは · ข้อมูลการใช้งานของคุณ</p>
+      </div>
+
+      <!-- OVERVIEW TAB -->
+      <div id="dt-overview">
+        <div id="d-nosub" class="no-sub" style="display:none">
+          <div style="font-size:48px;margin-bottom:16px">🌸</div>
+          <h3>ยังไม่มีแพ็กเกจ</h3>
+          <p>เลือกแพ็กเกจที่เหมาะกับคุณ<br>Admin จะยืนยันภายใน 5 นาทีหลังโอนเงิน</p>
+          <button class="btn-main" onclick="switchDashTab('order')">ดูแพ็กเกจ →</button>
+        </div>
+        <div id="d-hassub">
+          <div class="metric-row">
+            <div class="metric green">
+              <div class="metric-label">สถานะ · ステータス</div>
+              <div class="metric-val" id="m-status">—</div>
+              <div class="metric-sub" id="m-plan-name">—</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">วันหมดอายุ · 有効期限</div>
+              <div class="metric-val" id="m-days">—</div>
+              <div class="metric-sub" id="m-exp-date">—</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Protocol</div>
+              <div class="metric-val" id="m-proto" style="font-size:18px">—</div>
+              <div class="metric-sub" id="m-inbound">—</div>
+            </div>
+          </div>
+          <div class="box">
+            <div class="box-title">📈 การใช้งาน Traffic</div>
+            <div class="box-jp">トラフィック · เดือนนี้</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
+                <div style="font-size:10px;color:var(--ink3);letter-spacing:1px;margin-bottom:6px">UPLOAD</div>
+                <div style="font-family:'DM Serif Display',serif;font-size:20px" id="t-up">—</div>
+              </div>
+              <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
+                <div style="font-size:10px;color:var(--ink3);letter-spacing:1px;margin-bottom:6px">DOWNLOAD</div>
+                <div style="font-family:'DM Serif Display',serif;font-size:20px" id="t-down">—</div>
+              </div>
+              <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
+                <div style="font-size:10px;color:var(--ink3);letter-spacing:1px;margin-bottom:6px">TOTAL</div>
+                <div style="font-family:'DM Serif Display',serif;font-size:20px" id="t-total">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIG TAB -->
+      <div id="dt-config" style="display:none">
+        <div id="d-noconfig" class="no-sub" style="display:none">
+          <div style="font-size:48px;margin-bottom:16px">🔑</div>
+          <h3>ยังไม่มี Config</h3>
+          <p>สั่งซื้อแพ็กเกจและรอ Admin ยืนยันก่อนนะครับ</p>
+          <button class="btn-main" onclick="switchDashTab('order')">สั่งซื้อแพ็กเกจ →</button>
+        </div>
+        <div id="d-hasconfig">
+          <div class="box">
+            <div class="box-title">🔑 Config & QR Code</div>
+            <div class="box-jp">接続情報 · ข้อมูลการเชื่อมต่อ</div>
+            <div class="cfg-item"><div><div class="ci-label">ADDRESS</div><div class="ci-val" id="cfg-addr">—</div></div><button class="ci-copy" onclick="doCopy(this,'cfg-addr')">copy</button></div>
+            <div class="cfg-item"><div><div class="ci-label">UUID / PASSWORD</div><div class="ci-val" id="cfg-uuid">—</div></div><button class="ci-copy" onclick="doCopy(this,'cfg-uuid')">copy</button></div>
+            <div class="cfg-item"><div><div class="ci-label">PROTOCOL</div><div class="ci-val" id="cfg-proto">—</div></div></div>
+            <div class="cfg-item"><div><div class="ci-label">VLESS / TROJAN LINK</div><div class="ci-val" id="cfg-link" style="font-size:11px">—</div></div><button class="ci-copy" onclick="doCopy(this,'cfg-link')">copy</button></div>
+            <div class="qr-row">
+              <div class="qr-img"><img id="qr-img" src="" alt="QR Code"></div>
+              <div class="qr-desc">
+                <p>สแกน QR ด้วย <strong>v2rayNG</strong>, <strong>Hiddify</strong> หรือ <strong>Streisand</strong> เพื่อเชื่อมต่อทันที ไม่ต้องตั้งค่าเอง</p>
+                <button class="act-btn" onclick="downloadQR()">⬇ บันทึก QR</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECK EXPIRY TAB -->
+      <div id="dt-check" style="display:none">
+        <div class="box">
+          <div class="box-title">⏱️ เช็คอายุ Config</div>
+          <div class="box-jp">期限チェック · วางลิงก์แล้วกดเช็คได้เลย</div>
+          <div class="field">
+            <label>VLESS / TROJAN LINK</label>
+            <textarea id="check-input" placeholder="vless://... หรือ trojan://..." rows="3"></textarea>
+          </div>
+          <button class="btn-enter" onclick="checkExpiry()" style="margin-top:8px">เช็คอายุ →</button>
+          <div class="check-result" id="check-result">
+            <div class="check-result-row"><span class="label">UUID / PASSWORD</span><span class="val" id="cr-uuid">—</span></div>
+            <div class="check-result-row"><span class="label">HOST</span><span class="val" id="cr-host">—</span></div>
+            <div class="check-result-row"><span class="label">PORT</span><span class="val" id="cr-port">—</span></div>
+            <div class="check-result-row"><span class="label">PROTOCOL</span><span class="val" id="cr-proto">—</span></div>
+            <div class="check-result-row"><span class="label">สถานะ</span><span class="val" id="cr-status">—</span></div>
+            <div class="check-result-row"><span class="label">วันหมดอายุ</span><span class="val" id="cr-expiry">—</span></div>
+            <div class="check-result-row"><span class="label">วันที่เหลือ</span><span class="val" id="cr-days">—</span></div>
+          </div>
+        </div>
+        <div class="box" style="margin-top:16px">
+          <div class="box-title" style="font-size:13px;color:var(--ink2);font-weight:400">💡 วิธีใช้</div>
+          <div style="font-size:13px;color:var(--ink2);line-height:1.8;margin-top:8px;font-weight:300">
+            1. คัดลอก VLESS link หรือ Trojan link จากแอป v2rayNG หรือ Hiddify<br>
+            2. วางในช่องด้านบน<br>
+            3. กด "เช็คอายุ" ระบบจะดึงข้อมูลจาก 3x-ui ให้อัตโนมัติ
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER TAB -->
+      <div id="dt-order" style="display:none">
+        <div class="box">
+          <div class="box-title">📦 สั่งซื้อแพ็กเกจ</div>
+          <div class="box-jp">パッケージ · โอนเงินแล้วแจ้ง Admin</div>
+          <div class="plans" id="dash-plans-grid" style="margin-top:16px">
+            <div style="text-align:center;padding:40px;color:var(--ink3);grid-column:1/-1">กำลังโหลด...</div>
+          </div>
+        </div>
+        <div class="box" style="margin-top:16px" id="order-confirm-box" style="display:none">
+          <div class="box-title">✅ คำสั่งซื้อของฉัน</div>
+          <div id="order-history"></div>
+        </div>
+      </div>
+
+    </div><!-- end dash-main -->
+  </div>
+</div>
+
+<!-- ===== ADMIN ===== -->
+<div class="page" id="page-admin">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-user">
+        <div class="d-avatar">⚙️</div>
+        <div><div class="d-name">Admin</div><div class="d-plan">ADMINISTRATOR · 管理者</div></div>
+      </div>
+      <div class="snav">
+        <div class="snav-label">管理</div>
+        <a id="atab-orders" class="on" onclick="switchAdminTab('orders')">📋 คำสั่งซื้อ</a>
+        <a id="atab-users" onclick="switchAdminTab('users')">👥 ผู้ใช้งาน</a>
+        <div class="snav-label">システム</div>
+        <a onclick="showPage('home')">← หน้าหลัก</a>
+        <a onclick="doLogout()">🚪 ออกจากระบบ</a>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-hdr">
+        <div><h2>Admin Panel</h2><p>管理パネル · จัดการระบบทั้งหมด</p></div>
+        <button class="btn-pill" onclick="loadAdmin()">🔄 รีเฟรช</button>
+      </div>
+      <div class="admin-metrics">
+        <div class="am"><div class="am-label">USER ทั้งหมด</div><div class="am-val" id="a-users">—</div></div>
+        <div class="am"><div class="am-label">ACTIVE</div><div class="am-val" style="color:var(--matcha)" id="a-active">—</div></div>
+        <div class="am"><div class="am-label">รอยืนยัน</div><div class="am-val" style="color:var(--gold)" id="a-pending">—</div></div>
+        <div class="am"><div class="am-label">รายได้รวม</div><div class="am-val" style="color:var(--accent)" id="a-revenue">—</div></div>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <div id="adt-orders">
+        <div class="tcard">
+          <div class="tcard-hdr"><h3>📋 คำสั่งซื้อรอยืนยัน Slip</h3></div>
+          <table><thead><tr><th>#</th><th>USERNAME</th><th>แพ็กเกจ</th><th>ราคา</th><th>วันที่</th><th>ACTION</th></tr></thead>
+          <tbody id="tb-pending"></tbody></table>
+        </div>
+        <div class="tcard">
+          <div class="tcard-hdr"><h3>📜 ประวัติคำสั่งซื้อทั้งหมด</h3></div>
+          <table><thead><tr><th>#</th><th>USERNAME</th><th>แพ็กเกจ</th><th>ราคา</th><th>สถานะ</th><th>วันที่</th></tr></thead>
+          <tbody id="tb-orders"></tbody></table>
+        </div>
+      </div>
+
+      <!-- USERS TAB -->
+      <div id="adt-users" style="display:none">
+        <div class="tcard">
+          <div class="tcard-hdr"><h3>👥 ผู้ใช้งานทั้งหมด</h3></div>
+          <table><thead><tr><th>USERNAME</th><th>EMAIL</th><th>แพ็กเกจ</th><th>Protocol</th><th>หมดอายุ</th><th>สถานะ</th><th>ACTION</th></tr></thead>
+          <tbody id="tb-users"></tbody></table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let token = localStorage.getItem('token');
+let me = null;
+
+// ===== UTILS =====
+function toast(msg, dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+function fmtBytes(b){
+  if(!b||b===0)return '0 B';
+  const u=['B','KB','MB','GB','TB'];
+  const i=Math.floor(Math.log(b)/Math.log(1024));
+  return (b/Math.pow(1024,i)).toFixed(2)+' '+u[i];
+}
+function fmtDate(d){
+  if(!d)return '—';
+  return new Date(d).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'});
+}
+function daysLeft(d){
+  if(!d)return 0;
+  return Math.max(0,Math.ceil((new Date(d)-new Date())/86400000));
+}
+
+// ===== MODAL =====
+function openModal(){document.getElementById('overlay').classList.add('open')}
+function closeModal(){document.getElementById('overlay').classList.remove('open')}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+function switchTab(el,id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('form-login').style.display=id==='login'?'':'none';
+  document.getElementById('form-reg').style.display=id==='reg'?'':'none';
+}
+
+// ===== PAGES =====
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='dash')loadDash();
+  if(name==='admin')loadAdmin();
+}
+function requireLogin(cb){if(token)cb();else openModal()}
+
+// ===== NAV =====
+function updateNav(){
+  const nr=document.getElementById('nav-right');
+  if(token&&me){
+    nr.innerHTML=me.is_admin
+      ?`<button class="btn-text" onclick="showPage('admin')">⚙️ Admin</button><button class="btn-text" onclick="showPage('dash')">Dashboard</button><button class="btn-pill" onclick="doLogout()">ออกจากระบบ</button>`
+      :`<button class="btn-text" onclick="showPage('dash')">Dashboard</button><button class="btn-pill" onclick="doLogout()">ออกจากระบบ</button>`;
+  }else{
+    nr.innerHTML=`<button class="btn-text" onclick="openModal()">เข้าสู่ระบบ</button><button class="btn-pill" onclick="openModal()">สมัครฟรี</button>`;
+  }
+}
+
+// ===== AUTH =====
+async function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  if(!u||!p){document.getElementById('lerr').textContent='กรุณากรอกข้อมูลให้ครบ';return}
+  const btn=document.getElementById('lbtn');
+  btn.disabled=true; btn.textContent='กำลังเข้าสู่ระบบ...';
+  document.getElementById('lerr').textContent='';
+  try{
+    const r=await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!r.ok){document.getElementById('lerr').textContent=d.detail||'เกิดข้อผิดพลาด';return}
+    token=d.access_token; localStorage.setItem('token',token); me=d.user;
+    closeModal(); updateNav();
+    if(me.is_admin)showPage('admin'); else showPage('dash');
+  }catch(e){document.getElementById('lerr').textContent='เชื่อมต่อไม่ได้'}
+  finally{btn.disabled=false; btn.textContent='เข้าสู่ระบบ →'}
+}
+
+async function doRegister(){
+  const u=document.getElementById('ru').value.trim();
+  const e=document.getElementById('re').value.trim();
+  const p=document.getElementById('rp').value;
+  if(!u||!e||!p){document.getElementById('rerr').textContent='กรุณากรอกข้อมูลให้ครบ';return}
+  if(p.length<6){document.getElementById('rerr').textContent='รหัสผ่านอย่างน้อย 6 ตัว';return}
+  const btn=document.getElementById('rbtn');
+  btn.disabled=true; btn.textContent='กำลังสมัคร...';
+  document.getElementById('rerr').textContent='';
+  try{
+    const r=await fetch(API+'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,email:e,password:p})});
+    const d=await r.json();
+    if(!r.ok){document.getElementById('rerr').textContent=d.detail||'เกิดข้อผิดพลาด';return}
+    token=d.access_token; localStorage.setItem('token',token); me=d.user;
+    closeModal(); updateNav(); showPage('dash');
+  }catch(e){document.getElementById('rerr').textContent='เชื่อมต่อไม่ได้'}
+  finally{btn.disabled=false; btn.textContent='สมัครสมาชิก →'}
+}
+
+function doLogout(){token=null;me=null;localStorage.removeItem('token');updateNav();showPage('home')}
+
+async function loadMe(){
+  if(!token)return;
+  try{
+    const r=await fetch(API+'/api/me',{headers:{'Authorization':'Bearer '+token}});
+    if(!r.ok){doLogout();return}
+    me=await r.json(); updateNav();
+  }catch(e){}
+}
+
+// ===== DASHBOARD TABS =====
+function switchDashTab(tab){
+  ['overview','config','check','order'].forEach(t=>{
+    document.getElementById('dt-'+t).style.display=t===tab?'':'none';
+    const el=document.getElementById('tab-'+t);
+    if(el)el.classList.toggle('on',t===tab);
+  });
+  if(tab==='order')loadDashPlans();
+  if(tab==='config')renderConfig();
+}
+
+// ===== LOAD DASHBOARD =====
+async function loadDash(){
+  if(!token){openModal();return}
+  await loadMe();
+  if(!me)return;
+  document.getElementById('d-username').textContent=me.username;
+  document.getElementById('d-greeting').textContent='สวัสดีครับ '+me.username+' 🌸';
+  const sub=me.subscription;
+  if(!sub||!sub.is_active){
+    document.getElementById('d-nosub').style.display='';
+    document.getElementById('d-hassub').style.display='none';
+    document.getElementById('d-noconfig').style.display='';
+    document.getElementById('d-hasconfig').style.display='none';
+    document.getElementById('d-plan').textContent='ยังไม่มีแพ็กเกจ';
+    document.getElementById('d-greeting-sub').textContent='こんにちは · สั่งซื้อแพ็กเกจเพื่อเริ่มใช้งาน';
+  }else{
+    document.getElementById('d-nosub').style.display='none';
+    document.getElementById('d-hassub').style.display='';
+    document.getElementById('d-noconfig').style.display='none';
+    document.getElementById('d-hasconfig').style.display='';
+    document.getElementById('d-plan').textContent=sub.plan_name+' · アクティブ';
+    document.getElementById('d-greeting-sub').textContent='こんにちは · การเชื่อมต่อของคุณปกติดี';
+    const days=daysLeft(sub.expires_at);
+    document.getElementById('m-status').textContent='ACTIVE';
+    document.getElementById('m-plan-name').textContent=sub.plan_name||sub.plan;
+    document.getElementById('m-days').textContent=days+' วัน';
+    document.getElementById('m-exp-date').textContent='หมด '+fmtDate(sub.expires_at);
+    document.getElementById('m-proto').textContent=sub.protocol||'VLESS';
+    document.getElementById('m-inbound').textContent='Inbound #'+sub.inbound_id;
+    document.getElementById('t-up').textContent=fmtBytes(sub.traffic_up||0);
+    document.getElementById('t-down').textContent=fmtBytes(sub.traffic_down||0);
+    document.getElementById('t-total').textContent=fmtBytes((sub.traffic_up||0)+(sub.traffic_down||0));
+    renderConfig();
+  }
+}
+
+function renderConfig(){
+  const sub=me&&me.subscription;
+  if(!sub||!sub.xui_uuid)return;
+  document.getElementById('cfg-addr').textContent='shopdomu.duckdns.org';
+  document.getElementById('cfg-uuid').textContent=sub.xui_uuid;
+  document.getElementById('cfg-proto').textContent=sub.protocol||'VLESS';
+  let link='';
+  if((sub.protocol||'').toLowerCase()==='trojan'){
+    link=`trojan://${sub.xui_uuid}@shopdomu.duckdns.org:3128?security=tls&type=tcp#domuVPN-Game`;
+  }else{
+    link=`vless://${sub.xui_uuid}@shopdomu.duckdns.org:8080?type=tcp&security=none#domuVPN-Normal`;
+  }
+  document.getElementById('cfg-link').textContent=link;
+  document.getElementById('qr-img').src='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(link)+'&size=88x88&bgcolor=ffffff&color=1a1714';
+}
+
+function downloadQR(){
+  const sub=me&&me.subscription;
+  if(!sub)return;
+  const link=document.getElementById('cfg-link').textContent;
+  window.open('https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(link)+'&size=300x300','_blank');
+}
+
+// ===== CHECK EXPIRY =====
+async function checkExpiry(){
+  const input=document.getElementById('check-input').value.trim();
+  if(!input){toast('กรุณาวาง VLESS หรือ Trojan link ก่อนครับ');return}
+  const res=document.getElementById('check-result');
+  res.classList.remove('show');
+  try{
+    let protocol='',uuid_or_pass='',host='',port='';
+    if(input.startsWith('vless://')){
+      protocol='VLESS';
+      const u=new URL(input);
+      uuid_or_pass=u.username;
+      host=u.hostname;
+      port=u.port;
+    }else if(input.startsWith('trojan://')){
+      protocol='Trojan';
+      const u=new URL(input);
+      uuid_or_pass=u.username;
+      host=u.hostname;
+      port=u.port;
+    }else{
+      toast('รูปแบบลิงก์ไม่ถูกต้อง ต้องเป็น vless:// หรือ trojan://');
+      return;
+    }
+    document.getElementById('cr-uuid').textContent=uuid_or_pass;
+    document.getElementById('cr-host').textContent=host;
+    document.getElementById('cr-port').textContent=port;
+    document.getElementById('cr-proto').textContent=protocol;
+
+    // เช็คจาก API
+    const r=await fetch(API+'/api/check-expiry?uuid='+uuid_or_pass,{
+      headers: token?{'Authorization':'Bearer '+token}:{}
+    });
+    if(r.ok){
+      const d=await r.json();
+      const days=daysLeft(d.expires_at);
+      document.getElementById('cr-expiry').textContent=fmtDate(d.expires_at);
+      document.getElementById('cr-days').textContent=days+' วัน';
+      const statusEl=document.getElementById('cr-status');
+      if(!d.expires_at){
+        statusEl.textContent='ไม่จำกัดอายุ'; statusEl.className='val ok';
+      }else if(days>7){
+        statusEl.textContent='✅ ใช้งานได้'; statusEl.className='val ok';
+      }else if(days>0){
+        statusEl.textContent='⚠️ ใกล้หมด'; statusEl.className='val warn';
+      }else{
+        statusEl.textContent='❌ หมดอายุแล้ว'; statusEl.className='val expired';
+      }
+    }else{
+      document.getElementById('cr-status').textContent='ไม่พบข้อมูลใน server';
+      document.getElementById('cr-status').className='val expired';
+      document.getElementById('cr-expiry').textContent='—';
+      document.getElementById('cr-days').textContent='—';
+    }
+    res.classList.add('show');
+  }catch(e){
+    toast('เกิดข้อผิดพลาด: '+e.message);
+  }
+}
+
+// ===== PACKAGES =====
+async function loadPackages(){
+  try{
+    const r=await fetch(API+'/api/packages');
+    const pkgs=await r.json();
+    renderPlans(pkgs,'plans-grid',false);
+  }catch(e){
+    document.getElementById('plans-grid').innerHTML='<div style="text-align:center;padding:40px;color:var(--ink3);grid-column:1/-1">โหลดไม่ได้</div>';
+  }
+}
+
+async function loadDashPlans(){
+  try{
+    const r=await fetch(API+'/api/packages');
+    const pkgs=await r.json();
+    renderPlans(pkgs,'dash-plans-grid',true);
+    loadOrderHistory();
+  }catch(e){}
+}
+
+function renderPlans(pkgs,gridId,isDash){
+  const grid=document.getElementById(gridId);
+  let html='';
+  const normal=pkgs.filter(p=>p.type==='normal');
+  const game=pkgs.filter(p=>p.type==='game');
+  if(normal.length){
+    html+=`<div class="plan-type-label"><span>ทั่วไป · NORMAL</span></div>`;
+    normal.forEach(p=>{
+      html+=`<div class="plan" onclick="${isDash?`orderPlan('${p.id}')`:`requireLogin(()=>{ showPage('dash'); setTimeout(()=>switchDashTab('order'),300); }`}">
+        <span class="plan-badge normal">🌐 ทั่วไป</span>
+        <div class="plan-icon">🌸</div>
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-name-jp">${p.name_jp}</div>
+        <div class="plan-price-row"><span style="font-size:14px">฿</span><div class="plan-price">${p.price}</div><div class="plan-period">/ ${p.days} วัน</div></div>
+        <div class="plan-proto">VLESS Protocol</div>
+        <div class="plan-div"></div>
+        <button class="plan-btn">${isDash?'สั่งซื้อ →':'เลือกแพ็กเกจนี้'}</button>
+      </div>`;
+    });
+  }
+  if(game.length){
+    html+=`<div class="plan-type-label" style="grid-column:1/-1"><span>เกม · GAMING</span></div>`;
+    game.forEach(p=>{
+      html+=`<div class="plan game" onclick="${isDash?`orderPlan('${p.id}')`:`requireLogin(()=>{ showPage('dash'); setTimeout(()=>switchDashTab('order'),300); }`}">
+        <span class="plan-badge game">🎮 เกม</span>
+        <div class="plan-icon">🎮</div>
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-name-jp">${p.name_jp}</div>
+        <div class="plan-price-row"><span style="font-size:14px">฿</span><div class="plan-price">${p.price}</div><div class="plan-period">/ ${p.days} วัน</div></div>
+        <div class="plan-proto">Trojan Protocol · Ping ต่ำ</div>
+        <div class="plan-div"></div>
+        <button class="plan-btn">${isDash?'สั่งซื้อ →':'เลือกแพ็กเกจนี้'}</button>
+      </div>`;
+    });
+  }
+  grid.innerHTML=html;
+}
+
+async function orderPlan(plan){
+  if(!token){openModal();return}
+  if(!confirm('ยืนยันสั่งซื้อแพ็กเกจนี้?\nหลังกด OK กรุณาโอนเงินให้ Admin แล้วแจ้งยืนยัน'))return;
+  try{
+    const r=await fetch(API+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan})});
+    const d=await r.json();
+    if(!r.ok){toast('❌ '+d.detail);return}
+    toast('✅ สร้างคำสั่งซื้อแล้ว! กรุณาโอนเงินแล้วแจ้ง Admin ครับ');
+    loadOrderHistory();
+  }catch(e){toast('เกิดข้อผิดพลาด')}
+}
+
+async function loadOrderHistory(){
+  try{
+    const r=await fetch(API+'/api/orders/me',{headers:{'Authorization':'Bearer '+token}});
+    const orders=await r.json();
+    const box=document.getElementById('order-confirm-box');
+    const el=document.getElementById('order-history');
+    if(!orders.length){box.style.display='none';return}
+    box.style.display='';
+    el.innerHTML=orders.slice().reverse().map(o=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <div>
+          <div style="font-weight:500">${o.plan_name||o.plan}</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px">${fmtDate(o.created_at)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-family:'DM Serif Display',serif;font-size:16px">฿${o.amount}</div>
+          <span class="chip ${o.status==='approved'?'chip-green':o.status==='pending'?'chip-yellow':'chip-red'}">${o.status==='approved'?'✅ อนุมัติแล้ว':o.status==='pending'?'⏳ รอยืนยัน':'❌ ยกเลิก'}</span>
+        </div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+// ===== ADMIN =====
+function switchAdminTab(tab){
+  ['orders','users'].forEach(t=>{
+    document.getElementById('adt-'+t).style.display=t===tab?'':'none';
+    document.getElementById('atab-'+t).classList.toggle('on',t===tab);
+  });
+}
+
+async function loadAdmin(){
+  if(!token)return;
+  try{
+    const [sR,uR,oR]=await Promise.all([
+      fetch(API+'/api/admin/stats',{headers:{'Authorization':'Bearer '+token}}),
+      fetch(API+'/api/admin/users',{headers:{'Authorization':'Bearer '+token}}),
+      fetch(API+'/api/admin/orders',{headers:{'Authorization':'Bearer '+token}})
+    ]);
+    if(!sR.ok)return;
+    const s=await sR.json();
+    document.getElementById('a-users').textContent=s.total_users||0;
+    document.getElementById('a-active').textContent=s.active_subs||0;
+    document.getElementById('a-pending').textContent=s.pending_orders||0;
+    document.getElementById('a-revenue').textContent='฿'+(s.revenue||0).toLocaleString();
+
+    const orders=await oR.json();
+    const pending=orders.filter(o=>o.status==='pending');
+    document.getElementById('tb-pending').innerHTML=pending.length?pending.map(o=>`
+      <tr>
+        <td>#${o.id}</td>
+        <td style="font-weight:500">${o.username||'user#'+o.user_id}</td>
+        <td>${o.plan_name||o.plan}</td>
+        <td style="font-family:'DM Serif Display',serif">฿${o.amount}</td>
+        <td style="color:var(--ink3);font-size:11px">${fmtDate(o.created_at)}</td>
+        <td><button class="act-btn ok" onclick="approveOrder(${o.id})">✓ อนุมัติ</button></td>
+      </tr>`).join('')
+      :'<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:24px">ไม่มีคำสั่งซื้อที่รอยืนยัน 🌸</td></tr>';
+
+    document.getElementById('tb-orders').innerHTML=orders.length?orders.map(o=>`
+      <tr>
+        <td>#${o.id}</td>
+        <td style="font-weight:500">${o.username||'user#'+o.user_id}</td>
+        <td>${o.plan_name||o.plan}</td>
+        <td style="font-family:'DM Serif Display',serif">฿${o.amount}</td>
+        <td><span class="chip ${o.status==='approved'?'chip-green':o.status==='pending'?'chip-yellow':'chip-red'}">${o.status==='approved'?'อนุมัติแล้ว':o.status==='pending'?'รอยืนยัน':'ยกเลิก'}</span></td>
+        <td style="color:var(--ink3);font-size:11px">${fmtDate(o.created_at)}</td>
+      </tr>`).join('')
+      :'<tr><td colspan="6" style="text-align:center;color:var(--ink3);padding:24px">ยังไม่มีคำสั่งซื้อ</td></tr>';
+
+    const users=await uR.json();
+    document.getElementById('tb-users').innerHTML=users.length?users.map(u=>`
+      <tr>
+        <td style="font-weight:500">${u.username}</td>
+        <td style="color:var(--ink3);font-size:12px">${u.email}</td>
+        <td>${u.subscription?u.subscription.plan_name||u.subscription.plan:'—'}</td>
+        <td>${u.subscription?u.subscription.protocol||'—':'—'}</td>
+        <td>${u.subscription?fmtDate(u.subscription.expires_at):'—'}</td>
+        <td><span class="chip ${u.subscription?'chip-green':'chip-red'}">${u.subscription?'ACTIVE':'NO PLAN'}</span></td>
+        <td>${!u.is_admin?`<button class="act-btn del" onclick="deleteUser(${u.id},'${u.username}')">ลบ</button>`:'—'}</td>
+      </tr>`).join('')
+      :'<tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:24px">ยังไม่มีผู้ใช้งาน</td></tr>';
+  }catch(e){console.error(e)}
+}
+
+async function approveOrder(id){
+  if(!confirm('อนุมัติคำสั่งซื้อ #'+id+'?\nระบบจะสร้าง user ใน 3x-ui อัตโนมัติ'))return;
+  try{
+    toast('⏳ กำลังสร้าง user ใน 3x-ui...');
+    const r=await fetch(API+'/api/admin/orders/'+id+'/approve',{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    const d=await r.json();
+    if(r.ok){toast('✅ อนุมัติแล้ว! UUID: '+d.uuid.slice(0,8)+'...');loadAdmin();}
+    else toast('❌ '+d.detail);
+  }catch(e){toast('เกิดข้อผิดพลาด')}
+}
+
+async function deleteUser(id,name){
+  if(!confirm('ลบ user "'+name+'" ?\nไม่สามารถกู้คืนได้'))return;
+  try{
+    const r=await fetch(API+'/api/admin/users/'+id,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});
+    if(r.ok){toast('✅ ลบ user แล้ว');loadAdmin();}
+    else toast('❌ ลบไม่ได้');
+  }catch(e){toast('เกิดข้อผิดพลาด')}
+}
+
+// ===== AVATAR =====
+function changeAvatar(input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('avi-img');
+    document.getElementById('avi-emoji').style.display='none';
+    img.src=e.target.result; img.style.display='block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ===== COPY =====
+function doCopy(btn,elId){
+  const text=document.getElementById(elId).textContent;
+  navigator.clipboard.writeText(text).catch(()=>{});
+  const o=btn.textContent;
+  btn.textContent='✓'; btn.style.background='var(--matcha)'; btn.style.color='white'; btn.style.borderColor='var(--matcha)';
+  setTimeout(()=>{btn.textContent=o;btn.style.background='';btn.style.color='';btn.style.borderColor=''},1500);
+}
+
+// ===== STATS =====
+async function loadStats(){
+  try{
+    const r=await fetch(API+'/api/admin/stats',{headers:{'Authorization':'Bearer '+(token||'')}});
+    if(r.ok){const d=await r.json();document.getElementById('stat-users').textContent=d.total_users||'—'}
+  }catch(e){}
+}
+
+// ===== INIT =====
+(async()=>{
+  if(token)await loadMe();
+  updateNav();
+  loadPackages();
+  loadStats();
+})();
+</script>
+</body>
+</html>
